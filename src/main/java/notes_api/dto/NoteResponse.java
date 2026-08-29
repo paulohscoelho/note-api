@@ -1,6 +1,6 @@
 package notes_api.dto;
 
-import notes_api.entity.NoteEntity;
+import user.dto.UserResponse;
 
 import java.time.LocalDateTime;
 
@@ -9,6 +9,6 @@ public record NoteResponse(
         String title,
         String content,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        UserResponse user
 ) {
 }

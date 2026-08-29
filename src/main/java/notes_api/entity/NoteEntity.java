@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import user.entity.UserEntity;
 
 import java.time.LocalDateTime;
 @Getter
@@ -35,6 +36,8 @@ public class NoteEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
 }
