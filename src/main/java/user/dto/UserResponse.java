@@ -2,7 +2,7 @@ package user.dto;
 
 import java.util.UUID;
 
-public record UserResponseDTO(
+public record UserResponse(
         UUID uuid,
         String email
 ) {

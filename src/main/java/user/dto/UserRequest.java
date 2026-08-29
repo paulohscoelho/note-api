@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record UserRequestDTO(
+public record UserRequest(
         @NotBlank
         @Size(max = 100)
         @Email(message = "O email deve ter um formato válido")

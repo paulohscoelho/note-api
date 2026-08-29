@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import notes_api.entity.NoteEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,5 +31,5 @@ public class UserEntity {
     private String password;
 
     @OneToMany(mappedBy = "user")
-    private List<NoteEntity> notes;
+    private List<NoteEntity> notes = new ArrayList<>();
 }
