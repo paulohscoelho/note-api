@@ -1,10 +1,12 @@
 package notesapi.user.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import notesapi.user.dto.UserRequest;
 import notesapi.user.dto.UserResponse;
 import notesapi.user.entity.UserEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -14,6 +16,4 @@ public interface UserMapper {
     UserEntity toEntity(UserRequest request);
 
     UserResponse toResponse(UserEntity entity);
-
-
 }
