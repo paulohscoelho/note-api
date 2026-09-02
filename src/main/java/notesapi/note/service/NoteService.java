@@ -1,16 +1,17 @@
 package notesapi.note.service;
 
 import lombok.RequiredArgsConstructor;
+import notesapi.common.exception.RegraNegocioException;
 import notesapi.note.dto.NoteRequest;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.entity.NoteEntity;
-import notesapi.common.exception.RegraNegocioException;
 import notesapi.note.mapper.NoteMapper;
 import notesapi.note.repository.NoteRepository;
 import notesapi.user.entity.UserEntity;
 import notesapi.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.UUID;
 

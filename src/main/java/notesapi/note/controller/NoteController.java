@@ -7,7 +7,6 @@ import notesapi.note.dto.NoteResponse;
 import notesapi.note.service.NoteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,13 +34,15 @@ public class NoteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteResponse>> getAll(@RequestHeader("X-User-Id") UUID userId){
+    public ResponseEntity<List<NoteResponse>> getAllNotes(@RequestHeader("X-User-Id") UUID userId){
         List<NoteResponse> allNotes = service.findAllByUserUuid(userId);
         return ResponseEntity.ok(allNotes);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NoteResponse> update(@PathVariable("id") Long id ,@Valid @RequestBody NoteRequest request,@RequestHeader("X-User-Id") UUID userId){
+    public ResponseEntity<NoteResponse> update(@PathVariable("id") Long id ,
+                                               @Valid @RequestBody NoteRequest request,
+                                               @RequestHeader("X-User-Id") UUID userId){
         NoteResponse note = service.updateNote(id,request,userId);
         return ResponseEntity.ok(note);
     }
