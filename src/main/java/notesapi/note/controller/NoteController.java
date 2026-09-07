@@ -5,12 +5,13 @@ import lombok.RequiredArgsConstructor;
 import notesapi.note.dto.NoteRequest;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.service.NoteService;
+import notesapi.user.entity.UserEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/notes")
@@ -21,35 +22,35 @@ public class NoteController {
 
     @PostMapping
     public ResponseEntity<NoteResponse> create(@Valid @RequestBody NoteRequest request,
-                                               @RequestHeader("X-User-Id") UUID userId){
-        NoteResponse response = service.createNote(request, userId);
+                                               @AuthenticationPrincipal UserEntity user){
+        NoteResponse response = service.createNote(request, user.getUuid());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NoteResponse> getById(@PathVariable Long id,
-                                                @RequestHeader("X-User-Id") UUID userId){
-        NoteResponse response = service.findByIdAndUserUuid(id, userId);
+                                                @AuthenticationPrincipal UserEntity user){
+        NoteResponse response = service.findByIdAndUserUuid(id, user.getUuid());
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteResponse>> getAllNotes(@RequestHeader("X-User-Id") UUID userId){
-        List<NoteResponse> allNotes = service.findAllByUserUuid(userId);
+    public ResponseEntity<List<NoteResponse>> getAllNotes(@AuthenticationPrincipal UserEntity user){
+        List<NoteResponse> allNotes = service.findAllByUserUuid(user.getUuid());
         return ResponseEntity.ok(allNotes);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<NoteResponse> update(@PathVariable("id") Long id ,
                                                @Valid @RequestBody NoteRequest request,
-                                               @RequestHeader("X-User-Id") UUID userId){
-        NoteResponse note = service.updateNote(id,request,userId);
+                                               @AuthenticationPrincipal UserEntity user){
+        NoteResponse note = service.updateNote(id,request,user.getUuid());
         return ResponseEntity.ok(note);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id,@RequestHeader("X-User-Id") UUID userId){
-        service.deleteNote(id,userId);
+    public ResponseEntity<Void> delete(@PathVariable Long id,@AuthenticationPrincipal UserEntity user){
+        service.deleteNote(id,user.getUuid());
         return ResponseEntity.noContent().build();
     }
 }
