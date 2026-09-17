@@ -107,6 +107,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>me.paulschwarz</groupId>
+			<artifactId>springboot4-dotenv</artifactId>
+			<version>5.0.1</version>
+			<optional>true</optional>
+		</dependency>
+
 		<!-- JJWT Jackson (Serialização/Deserialização do JSON do Token) -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
