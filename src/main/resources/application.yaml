@@ -8,8 +8,8 @@ logging:
       springframework:
         security: DEBUG
 
-
 api:
   security:
     token:
-      secret: "QkVBNjhGNDYyRDU0NEI3OEE5RDUzRjYzRDU0QTY1Nzg="
+      secret: ${JWT_SECRET}
+      expiration: 86400000   # 24 horas em milissegundos
