@@ -2,6 +2,20 @@ spring:
   application:
     name: notes-api
 
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
 logging:
   level:
     org:
@@ -13,3 +27,12 @@ api:
     token:
       secret: ${JWT_SECRET}
       expiration: 86400000   # 24 horas em milissegundos
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

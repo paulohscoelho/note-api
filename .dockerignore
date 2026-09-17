@@ -1,0 +1,17 @@
+# Ignora o que não precisa ir pro contexto de build
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.idea
+*.iml
+.vscode
+.DS_Store
+Thumbs.db
+*.log
+logs/
+README.md
+erro.txt
