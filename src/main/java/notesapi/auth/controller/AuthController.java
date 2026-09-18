@@ -1,17 +1,21 @@
 package notesapi.auth.controller;
 
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import notesapi.auth.dto.LoginRequest;
 import notesapi.auth.dto.LoginResponse;
 import notesapi.security.JwtService;
+import notesapi.user.entity.UserEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -25,8 +29,9 @@ public class AuthController {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                 request.email(), request.password());
 
-        manager.authenticate(authToken);
-        String token = jwtService.generateToken(request.email());
+        Authentication authentication = manager.authenticate(authToken);
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        String token = jwtService.generateToken(user);
         return ResponseEntity.ok(new LoginResponse(token));
     }
 }
