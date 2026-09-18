@@ -8,6 +8,7 @@ import notesapi.user.dto.UserWithNotesResponse;
 import notesapi.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -30,6 +31,7 @@ public class UserController {
     }
 
     @GetMapping("/{uuid}")
+    @PreAuthorize("#uuid == authentication.principal.uuid or hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getById(@PathVariable UUID uuid){
         return ResponseEntity.ok(service.getUserById(uuid));
     }
@@ -40,6 +42,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{uuid}")
+    @PreAuthorize("#uuid == authentication.principal.uuid or hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable UUID uuid){
         service.removeUser(uuid);
         return ResponseEntity.noContent().build();
