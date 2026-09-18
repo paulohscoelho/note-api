@@ -28,6 +28,11 @@ api:
       secret: ${JWT_SECRET}
       expiration: 86400000   # 24 horas em milissegundos
 
+app:
+  admin:
+    email: ${ADMIN_EMAIL:}
+    password: ${ADMIN_PASSWORD:}
+
 management:
   endpoints:
     web:
