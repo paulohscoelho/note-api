@@ -15,6 +15,7 @@ public interface UserMapper {
 
     @Mapping(target = "uuid",ignore = true)
     @Mapping(target = "notes",ignore = true)
+    @Mapping(target = "role",ignore = true)
     UserEntity toEntity(UserRequest request);
 
     UserResponse toResponse(UserEntity entity);

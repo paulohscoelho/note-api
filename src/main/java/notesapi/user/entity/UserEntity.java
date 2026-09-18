@@ -37,9 +37,13 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<NoteEntity> notes = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false,length = 20)
+    private Role role = Role.USER;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_"+ role.name()));
     }
 
     @Override
