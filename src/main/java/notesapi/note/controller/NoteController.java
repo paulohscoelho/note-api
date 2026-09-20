@@ -23,14 +23,14 @@ public class NoteController {
     @PostMapping
     public ResponseEntity<NoteResponse> create(@Valid @RequestBody NoteRequest request,
                                                @AuthenticationPrincipal UserEntity user){
-        NoteResponse response = service.createNote(request, user.getUuid());
+        NoteResponse response = service.createNote(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NoteResponse> getById(@PathVariable Long id,
                                                 @AuthenticationPrincipal UserEntity user){
-        NoteResponse response = service.findByIdAndUserUuid(id, user.getUuid());
+        NoteResponse response = service.findById(id, user);
         return ResponseEntity.ok(response);
     }
 
@@ -44,13 +44,13 @@ public class NoteController {
     public ResponseEntity<NoteResponse> update(@PathVariable("id") Long id ,
                                                @Valid @RequestBody NoteRequest request,
                                                @AuthenticationPrincipal UserEntity user){
-        NoteResponse note = service.updateNote(id,request,user.getUuid());
+        NoteResponse note = service.updateNote(id,request,user);
         return ResponseEntity.ok(note);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id,@AuthenticationPrincipal UserEntity user){
-        service.deleteNote(id,user.getUuid());
+        service.deleteNote(id,user);
         return ResponseEntity.noContent().build();
     }
 }
