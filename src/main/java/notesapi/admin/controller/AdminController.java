@@ -2,6 +2,8 @@ package notesapi.admin.controller;
 
 import lombok.RequiredArgsConstructor;
 import notesapi.admin.dto.AdminUserResponse;
+import notesapi.note.dto.NoteResponse;
+import notesapi.note.service.NoteService;
 import notesapi.user.repository.UserRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminController {
   private final UserRepository userRepository;
+  private final NoteService noteService;
 
 
   @GetMapping("/users")
@@ -24,5 +27,11 @@ public class AdminController {
         .stream()
         .map(AdminUserResponse::from)
         .toList();
+  }
+
+  @GetMapping("/notes")
+  @PreAuthorize("hasRole('ADMIN')")
+  public List<NoteResponse> listAllNotes(){
+    return noteService.findAll();
   }
 }
