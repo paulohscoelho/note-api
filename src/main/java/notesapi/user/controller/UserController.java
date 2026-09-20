@@ -26,6 +26,7 @@ public class UserController {
     }
 
     @GetMapping("/{uuid}/notes")
+    @PreAuthorize("#uuid == authentication.principal.uuid or hasRole('ADMIN')")
     public ResponseEntity<UserWithNotesResponse> getWithNotes(@PathVariable UUID uuid){
         return ResponseEntity.ok(service.getUserWithNotes(uuid));
     }
@@ -37,6 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("#email == authentication.principal.username or hasRole('ADMIN')")
     public ResponseEntity<UserResponse> getByEmail(@RequestParam String email){
         return ResponseEntity.ok(service.getUserByEmail(email));
     }
