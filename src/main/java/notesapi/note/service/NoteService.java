@@ -1,7 +1,7 @@
 package notesapi.note.service;
 
 import lombok.RequiredArgsConstructor;
-import notesapi.common.exception.RegraNegocioException;
+import notesapi.common.exception.RecursoNaoEncontradoException;
 import notesapi.note.dto.NoteRequest;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.entity.NoteEntity;
@@ -66,10 +66,10 @@ public class NoteService {
     private NoteEntity loadAccessibleNote(Long id, UserEntity currentUser){
         if (currentUser.getRole() == Role.ADMIN){
             return noteRepository.findById(id)
-                .orElseThrow(()->new RegraNegocioException("notas não encontrada"));
+                .orElseThrow(()->new RecursoNaoEncontradoException("notas não encontrada"));
         }
         return noteRepository.findByIdAndUserUuid(id,currentUser.getUuid())
-            .orElseThrow(()-> new RegraNegocioException("notas não encontrada"));
+            .orElseThrow(()-> new RecursoNaoEncontradoException("notas não encontrada"));
     }
 
 }
