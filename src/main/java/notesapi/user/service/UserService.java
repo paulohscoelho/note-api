@@ -37,7 +37,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserWithNotesResponse getUserWithNotes(UUID uuid){
         UserEntity user = repository.findById(uuid)
-                .orElseThrow(()->new RecursoNaoEncontradoException("Usuario não encontrado"));
+                .orElseThrow(()->new RecursoNaoEncontradoException("Usuário não encontrado."));
         return mapper.toWithNotesResponse(user);
     }
 
@@ -58,7 +58,7 @@ public class UserService {
     @Transactional
     public void removeUser(UUID uuid){
         UserEntity user = repository.findById(uuid)
-                .orElseThrow(()->new RecursoNaoEncontradoException("Usuario não encontrado."));
+                .orElseThrow(()->new RecursoNaoEncontradoException("Usuário não encontrado."));
 
         repository.delete(user);
     }
