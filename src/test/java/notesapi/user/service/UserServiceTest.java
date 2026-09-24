@@ -78,8 +78,39 @@ class UserServiceTest {
       assertThat(salvo.getPassword()).isNotEqualTo("senha12345");
 
       verify(passwordEncoder).encode("senha12345");
-
-
     }
+
+    @Test
+    @DisplayName("deve retornar a resposta mapeada")
+    void deveRetornarRespostaMapeada(){
+      UserRequest request= new UserRequest("joao@test.com","senha12345");
+
+      when(userRepository.existsByEmail("joao@test.com")).thenReturn(false);
+      when(userMapper.toEntity(request)).thenReturn(userEntity);
+      when(passwordEncoder.encode("senha12345")).thenReturn("$2a$10$hashfalso");
+      when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+      when(userMapper.toResponse(userEntity)).thenReturn(userResponse);
+
+      UserResponse resultado = userService.createUser(request);
+      assertThat(resultado).isEqualTo(userResponse);
+    }
+
+    @Test
+    @DisplayName("deve lancar RegraNegoioException quando o email ja existe")
+    void deveLancarRegraNegocioException_quandoEmailExiste(){
+      UserRequest request = new UserRequest("joao@teste.com","senha12345");
+
+      when(userRepository.existsByEmail("joao@teste.com")).thenReturn(true);
+
+      assertThatThrownBy(()-> userService.createUser(request))
+          .isInstanceOf(RegraNegocioException.class)
+          .hasMessage("Email já em uso joao@teste.com");
+
+      verify(userRepository, never()).save(any());
+      verifyNoInteractions(userMapper);
+      verifyNoInteractions(passwordEncoder);
+    }
+
+
   }
 }
