@@ -2,6 +2,7 @@ package notesapi.security;
 
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -43,7 +44,11 @@ public class JwtService {
     }
 
     public Boolean isTokenExpired(String token){
-        Claims claims = extractAllClaims(token);
-        return claims.getExpiration().before(new Date());
+        try{
+            Claims claims = extractAllClaims(token);
+            return claims.getExpiration().before(new Date());
+        }catch (ExpiredJwtException ex){
+            return true;
+        }
     }
 }

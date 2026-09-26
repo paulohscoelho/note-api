@@ -66,10 +66,10 @@ public class NoteService {
     private NoteEntity loadAccessibleNote(Long id, UserEntity currentUser){
         if (currentUser.getRole() == Role.ADMIN){
             return noteRepository.findById(id)
-                .orElseThrow(()->new RecursoNaoEncontradoException("notas não encontrada"));
+                .orElseThrow(()->new RecursoNaoEncontradoException("nota não encontrada"));
         }
         return noteRepository.findByIdAndUserUuid(id,currentUser.getUuid())
-            .orElseThrow(()-> new RecursoNaoEncontradoException("notas não encontrada"));
+            .orElseThrow(()-> new RecursoNaoEncontradoException("nota não encontrada"));
     }
 
 }
