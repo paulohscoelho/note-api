@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.util.Date;
 import notesapi.user.entity.Role;
 import notesapi.user.entity.UserEntity;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,8 +60,51 @@ class JwtServiceTest {
       }
    }
 
+   @Nested
+   @DisplayName("extractUsername()")
+   class ExtractUsername{
+      @Test
+      @DisplayName("deve extrair o email do token gerado")
+      void deveExtrairEmailDoToken(){
+         String token = jwtService.generateToken(userEntity);
+         String username = jwtService.extractUsername(token);
+         assertThat(username).isEqualTo("joao@teste.com");
+      }
+   }
+
+   @Nested
+   @DisplayName("isTokenExpired()")
+   class IsTokenExpired {
+
+      @Test
+      @DisplayName("deve retornar false para token recém-gerado")
+      void deveRetornarFalse_paraTokenRecemGerado(){
+         String token = jwtService.generateToken(userEntity);
+         Boolean expirado = jwtService.isTokenExpired(token);
+         assertThat(expirado).isFalse();
+      }
+
+      @Test
+      @DisplayName("deve retornar true para token expirado")
+      void deveRetornarTrue_paraTokenExpirado() {
+         long agora = System.currentTimeMillis();
+         long umDiaAtras = agora - (1000L * 60*60 *24);
+
+         String tokenExpirado = Jwts.builder()
+             .subject(userEntity.getUsername())
+             .issuedAt(new Date(umDiaAtras))
+             .expiration(new Date(umDiaAtras))
+             .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_FAKE)))
+             .compact();
+
+         Boolean expirado = jwtService.isTokenExpired(tokenExpirado);
+         assertThat(expirado).isTrue();
+      }
+   }
+
    private Claims parseClaims(String token){
-      return Jwts.parser().verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_FAKE)))
+      return Jwts.parser()
+          .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_FAKE)))
           .build()
           .parseSignedClaims(token)
           .getPayload();
