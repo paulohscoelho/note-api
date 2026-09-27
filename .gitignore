@@ -44,3 +44,4 @@ logs/
 ### Sistema Operacional ###
 .DS_Store
 Thumbs.db
+qodana.yaml
