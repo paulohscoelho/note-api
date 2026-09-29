@@ -17,36 +17,18 @@ import java.util.UUID;
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService service;
 
     @PostMapping
-    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request){
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
         UserResponse user = service.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @GetMapping("/{uuid}/notes")
     @PreAuthorize("#uuid == authentication.principal.uuid or hasRole('ADMIN')")
-    public ResponseEntity<UserWithNotesResponse> getWithNotes(@PathVariable UUID uuid){
+    public ResponseEntity<UserWithNotesResponse> getWithNotes(@PathVariable UUID uuid) {
         return ResponseEntity.ok(service.getUserWithNotes(uuid));
-    }
-
-    @GetMapping("/{uuid}")
-    @PreAuthorize("#uuid == authentication.principal.uuid or hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> getById(@PathVariable UUID uuid){
-        return ResponseEntity.ok(service.getUserById(uuid));
-    }
-
-    @GetMapping("/search")
-    @PreAuthorize("#email == authentication.principal.username or hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> getByEmail(@RequestParam String email){
-        return ResponseEntity.ok(service.getUserByEmail(email));
-    }
-
-    @DeleteMapping("/{uuid}")
-    @PreAuthorize("#uuid == authentication.principal.uuid or hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable UUID uuid){
-        service.removeUser(uuid);
-        return ResponseEntity.noContent().build();
     }
 }
