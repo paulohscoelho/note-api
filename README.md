@@ -11,7 +11,7 @@ API REST para gerenciamento de notas por usuário, com autenticação JWT e auto
 
 ## 📖 Sobre
 
-A **Notes API** é uma API REST para gerenciamento de notas por usuário. Cada usuário pode criar, consultar, atualizar e remover suas próprias notas, além de gerenciar os dados da própria conta.
+A **Notes API** é uma API REST para gerenciamento de notas por usuário. Cada usuário pode criar, consultar, atualizar e remover suas próprias notas. A consulta e a remoção de usuários são operações administrativas.
 
 A autenticação é feita via **JWT**: o cliente faz login com email e senha, recebe um token e o envia no header `Authorization` das requisições seguintes. O acesso é controlado por **roles** (`USER` e `ADMIN`) combinadas com **ownership** dos recursos.
 
@@ -22,7 +22,7 @@ A principal característica é o isolamento de dados: um usuário `USER` enxerga
 - **Autenticação JWT** com login via email e senha
 - **Autorização por roles** (`USER` / `ADMIN`)
 - **Autorização por ownership** — o usuário só acessa seus próprios recursos; o admin acessa todos
-- **CRUD de usuários**
+- **Gestão de usuários** (cadastro público; consulta e remoção só para `ADMIN`)
 - **CRUD de notas**
 - **Endpoints administrativos** para listar todos os usuários e todas as notas
 - **Tratamento de erros padronizado** (404, 409, 400, 401, 403, 500)
@@ -125,10 +125,7 @@ Crie um arquivo `.env` a partir do `.env.example`. Ele contém dados sensíveis 
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
 | POST | `/users` | Cria um novo usuário | público |
-| GET | `/users/{uuid}` | Busca um usuário pelo UUID | USER (dono) ou ADMIN |
 | GET | `/users/{uuid}/notes` | Busca um usuário e suas notas | USER (dono) ou ADMIN |
-| GET | `/users/search?email=` | Busca um usuário pelo email | USER (dono) ou ADMIN |
-| DELETE | `/users/{uuid}` | Remove um usuário | USER (dono) ou ADMIN |
 
 ### Notes
 
@@ -145,6 +142,9 @@ Crie um arquivo `.env` a partir do `.env.example`. Ele contém dados sensíveis 
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
 | GET | `/admin/users` | Lista todos os usuários | ADMIN |
+| GET | `/admin/users/{uuid}` | Busca um usuário pelo UUID | ADMIN |
+| GET | `/admin/users/search?email=` | Busca um usuário pelo email | ADMIN |
+| DELETE | `/admin/users/{uuid}` | Remove um usuário | ADMIN |
 | GET | `/admin/notes` | Lista todas as notas | ADMIN |
 
 ### Infra
@@ -221,7 +221,7 @@ note-api/
 │   │   └── resources/
 │   │       └── application.yaml
 │   └── test/
-│       └── java/notesapi/   # Testes unitários
+│       └── java/notesapi/   # Testes unitários e de integração
 ├── .env.example             # Template das variáveis de ambiente
 ├── .gitignore
 ├── docker-compose.yml       # Orquestração: app + postgres + adminer
