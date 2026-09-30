@@ -1,0 +1,34 @@
+url: ${SPRING_DATASOURCE_URL}
+spring:
+  application:
+    name: notes-api
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    show-sql: false
+
+api:
+  security:
+    token:
+      secret: dGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQ=
+      expiration: 86400000
+
+app:
+  admin:
+    email: admin@test.com
+    password: admin123
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.security: INFO

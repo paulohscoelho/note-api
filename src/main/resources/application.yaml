@@ -21,6 +21,8 @@ logging:
     org:
       springframework:
         security: DEBUG
+    notesapi:
+      security: DEBUG
 
 api:
   security:
