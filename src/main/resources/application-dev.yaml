@@ -1,11 +1,8 @@
 spring:
-  application:
-    name: notes-api
-
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/notesdb
+    username: postgres
+    password: postgres
 
   jpa:
     hibernate:
@@ -14,32 +11,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    show-sql: false
-
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
-    notesapi:
-      security: DEBUG
+    show-sql: true
 
 api:
   security:
     token:
-      secret: ${JWT_SECRET}
-      expiration: 86400000   # 24 horas em milissegundos
+      secret: 3cfa76ef14937c1c0ea519f8fc057a80fcd04a7420f8e8bcd0a7567c272e007b
+      expiration: 86400000
 
 app:
   admin:
-    email: ${ADMIN_EMAIL:}
-    password: ${ADMIN_PASSWORD:}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: when-authorized
+    email: admin@notesapi.local
+    password: Admin@123456

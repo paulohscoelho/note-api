@@ -1,7 +1,4 @@
 spring:
-  application:
-    name: notes-api
-
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -9,37 +6,20 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     open-in-view: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
     show-sql: false
-
-logging:
-  level:
-    org:
-      springframework:
-        security: DEBUG
-    notesapi:
-      security: DEBUG
 
 api:
   security:
     token:
       secret: ${JWT_SECRET}
-      expiration: 86400000   # 24 horas em milissegundos
+      expiration: 86400000
 
 app:
   admin:
     email: ${ADMIN_EMAIL:}
     password: ${ADMIN_PASSWORD:}
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: when-authorized
