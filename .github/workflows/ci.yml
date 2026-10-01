@@ -23,4 +23,4 @@ jobs:
           cache: 'maven'
 
       - name: Run tests
-        run: ./mvnw test --no-transfer-progress
+        run: ./mvnw verify --no-transfer-progress
