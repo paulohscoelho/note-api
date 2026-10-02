@@ -27,15 +27,15 @@ public class NoteControllerIT extends AbstractIntegrationTest {
 
    @BeforeEach
    void setUp() {
-      jorge = criarUser("jorge@test.com", Role.USER);
-      joao = criarUser("joao@test.com", Role.USER);
-      admin = criarUser("admin@test.com", Role.ADMIN);
+      jorge = createUser("jorge@test.com", Role.USER);
+      joao = createUser("joao@test.com", Role.USER);
+      admin = createUser("admin@test.com", Role.ADMIN);
       tokenJorge = gerarToken(jorge);
       tokenJoao = gerarToken(joao);
       tokenAdmin = gerarToken(admin);
 
-      notaDoJorge = criarNota("Nota do Jorge", "conteúdo do jorge", jorge);
-      notaDoJoao = criarNota("Nota do Joao", "conteúdo do joao", joao);
+      notaDoJorge = createNote("Nota do Jorge", "conteúdo do jorge", jorge);
+      notaDoJoao = createNote("Nota do Joao", "conteúdo do joao", joao);
    }
 
    @Nested
@@ -48,8 +48,10 @@ public class NoteControllerIT extends AbstractIntegrationTest {
          mockMvc.perform(get("/notes")
                  .header("Authorization", "Bearer " + tokenJorge))
              .andExpect(status().isOk())
-             .andExpect(jsonPath("$.length()").value(1))
-             .andExpect(jsonPath("$[0].title").value("Nota do Jorge"));
+             .andExpect(jsonPath("$.content").isArray())
+             .andExpect(jsonPath("$.content.length()").value(1))
+             .andExpect(jsonPath("$.content[0].title").value("Nota do Jorge"))
+             .andExpect(jsonPath("$.totalElements").value(1));
       }
 
 

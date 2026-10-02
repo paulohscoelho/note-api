@@ -25,9 +25,9 @@ class UserControllerIT extends AbstractIntegrationTest {
 
    @BeforeEach
    void setUp() {
-      jorge = criarUser("jorge@test.com", Role.USER);
-      joao = criarUser("joao@test.com", Role.USER);
-      admin = criarUser("admin@test.com", Role.ADMIN);
+      jorge = createUser("jorge@test.com", Role.USER);
+      joao = createUser("joao@test.com", Role.USER);
+      admin = createUser("admin@test.com", Role.ADMIN);
       tokenJorge = gerarToken(jorge);
       tokenJoao = gerarToken(joao);
       tokenAdmin = gerarToken(admin);

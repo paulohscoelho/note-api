@@ -9,6 +9,8 @@ import notesapi.user.dto.UserWithNotesResponse;
 import notesapi.user.entity.UserEntity;
 import notesapi.user.mapper.UserMapper;
 import notesapi.user.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,18 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> getUsers(String search, Pageable pageable) {
+        if (search != null && !search.isBlank()) {
+            return repository
+                .findByEmailContainingIgnoreCase(search, pageable)
+                .map(mapper::toResponse);
+        }
+        return repository
+            .findAll(pageable)
+            .map(mapper::toResponse);
+    }
 
     @Transactional
     public UserResponse createUser(UserRequest request){
@@ -59,7 +73,6 @@ public class UserService {
     public void removeUser(UUID uuid){
         UserEntity user = repository.findById(uuid)
                 .orElseThrow(()->new RecursoNaoEncontradoException("Usuário não encontrado."));
-
         repository.delete(user);
     }
 

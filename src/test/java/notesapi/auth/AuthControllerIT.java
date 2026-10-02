@@ -19,7 +19,7 @@ class AuthControllerIT extends AbstractIntegrationTest {
 
    @BeforeEach
    void setUp() {
-      jorge = criarUser("jorge@test.com", Role.USER);
+      jorge = createUser("jorge@test.com", Role.USER);
    }
 
    @Test

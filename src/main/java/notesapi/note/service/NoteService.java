@@ -9,6 +9,8 @@ import notesapi.note.mapper.NoteMapper;
 import notesapi.note.repository.NoteRepository;
 import notesapi.user.entity.Role;
 import notesapi.user.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,33 @@ import java.util.UUID;
 public class NoteService {
     private final NoteRepository noteRepository;
     private final NoteMapper mapper;
+
+    @Transactional(readOnly = true)
+    public Page<NoteResponse> getNotes(String search, Pageable pageable) {
+        if (search != null && !search.isBlank()) {
+            return noteRepository
+                .findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(search, search, pageable)
+                .map(mapper::toResponse);
+        }
+        return noteRepository
+            .findAll(pageable)
+            .map(mapper::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NoteResponse> getUserNotes(UUID userId, String search, Pageable pageable) {
+        if (search != null && !search.isBlank()) {
+            return noteRepository
+                .findByUserUuidAndTitleContainingIgnoreCaseOrUserUuidAndContentContainingIgnoreCase(
+                    userId, search, userId, search, pageable
+                )
+                .map(mapper::toResponse);
+        }
+
+        return noteRepository
+            .findByUserUuid(userId, pageable)
+            .map(mapper::toResponse);
+    }
 
     @Transactional
     public NoteResponse createNote(NoteRequest request, UserEntity currentUser){

@@ -1,5 +1,4 @@
 package notesapi.admin;
-
 import notesapi.config.AbstractIntegrationTest;
 import notesapi.user.entity.Role;
 import notesapi.user.entity.UserEntity;
@@ -8,10 +7,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @DisplayName("AdminController (integração)")
 class AdminControllerIT extends AbstractIntegrationTest {
 
@@ -22,8 +23,8 @@ class AdminControllerIT extends AbstractIntegrationTest {
 
    @BeforeEach
    void setUp() {
-      admin = criarUser("admin@test.com", Role.ADMIN);
-      userComum = criarUser("user@test.com", Role.USER);
+      admin = createUser("admin@test.com", Role.ADMIN);
+      userComum = createUser("user@test.com", Role.USER);
       tokenAdmin = gerarToken(admin);
       tokenUser = gerarToken(userComum);
    }
@@ -33,12 +34,26 @@ class AdminControllerIT extends AbstractIntegrationTest {
    class ListUsers {
 
       @Test
-      @DisplayName("deve retornar 200 quando autenticado como ADMIN")
+      @DisplayName("deve retornar 200 e página de usuários quando autenticado como ADMIN")
       void deveRetornar200_quandoAdmin() throws Exception {
          mockMvc.perform(get("/admin/users")
                  .header("Authorization", "Bearer " + tokenAdmin))
              .andExpect(status().isOk())
-             .andExpect(jsonPath("$").isArray());
+             .andExpect(jsonPath("$.content").isArray())
+             .andExpect(jsonPath("$.content", hasSize(2)))
+             .andExpect(jsonPath("$.totalElements").value(2));
+      }
+
+      @Test
+      @DisplayName("deve filtrar usuários por termo de busca quando informado")
+      void deveFiltrarUsuarios_quandoSearchInformado() throws Exception {
+         mockMvc.perform(get("/admin/users")
+                 .param("search", "user")
+                 .header("Authorization", "Bearer " + tokenAdmin))
+             .andExpect(status().isOk())
+             .andExpect(jsonPath("$.content").isArray())
+             .andExpect(jsonPath("$.content", hasSize(1)))
+             .andExpect(jsonPath("$.content[0].email").value("user@test.com"));
       }
 
       @Test
@@ -59,7 +74,7 @@ class AdminControllerIT extends AbstractIntegrationTest {
 
    @Nested
    @DisplayName("GET /admin/users/{uuid}")
-   class GetById{
+   class GetById {
       @Test
       @DisplayName("deve retornar 200 quando ADMIN busca qualquer user")
       void deveRetornar200_quandoAdmin() throws Exception {
@@ -122,7 +137,4 @@ class AdminControllerIT extends AbstractIntegrationTest {
              .andExpect(status().isForbidden());
       }
    }
-
-
-
 }

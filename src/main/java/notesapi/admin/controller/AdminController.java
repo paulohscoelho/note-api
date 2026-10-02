@@ -7,6 +7,9 @@ import notesapi.note.service.NoteService;
 import notesapi.user.dto.UserResponse;
 import notesapi.user.repository.UserRepository;
 import notesapi.user.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +28,12 @@ public class AdminController {
   private final NoteService noteService;
 
   @GetMapping("/users")
-  public List<AdminUserResponse> listAllUsers() {
-    return userRepository.findAll().stream()
-        .map(AdminUserResponse::from)
-        .toList();
+  public ResponseEntity<Page<UserResponse>> listAllUsers(
+      @RequestParam(required = false) String search,
+      @PageableDefault(page = 0, size = 10, sort = "email") Pageable pageable) {
+
+    Page<UserResponse> users = userService.getUsers(search, pageable);
+    return ResponseEntity.ok(users);
   }
 
   @GetMapping("/users/{uuid}")
@@ -48,7 +53,11 @@ public class AdminController {
   }
 
   @GetMapping("/notes")
-  public List<NoteResponse> listAllNotes() {
-    return noteService.findAll();
+  public ResponseEntity<Page<NoteResponse>> listAllNotes(
+      @RequestParam(required = false) String search,
+      @PageableDefault(page = 0, size = 10, sort = "title") Pageable pageable) {
+
+    Page<NoteResponse> notes = noteService.getNotes(search, pageable);
+    return ResponseEntity.ok(notes);
   }
 }
