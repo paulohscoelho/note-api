@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,22 +26,34 @@ public abstract class AbstractIntegrationTest {
    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:16-alpine");
 
    static {
-      postgres.start();   //sobe manualmente.
+      postgres.start();
    }
 
-   @Autowired protected MockMvc mockMvc;
-   @Autowired protected UserRepository userRepository;
-   @Autowired protected NoteRepository noteRepository;
-   @Autowired protected PasswordEncoder passwordEncoder;
-   @Autowired protected JwtService jwtService;
+   @Autowired
+   protected MockMvc mockMvc;
+
+   @Autowired
+   protected UserRepository userRepository;
+
+   @Autowired
+   protected NoteRepository noteRepository;
+
+   @Autowired
+   protected PasswordEncoder passwordEncoder;
+
+   @Autowired
+   protected JwtService jwtService;
+
+   @Autowired
+   protected JdbcTemplate jdbcTemplate;
 
    @BeforeEach
    void limparBanco() {
-      noteRepository.deleteAll();
-      userRepository.deleteAll();
+      jdbcTemplate.execute("TRUNCATE TABLE tb_notes CASCADE");
+      jdbcTemplate.execute("TRUNCATE TABLE tb_users CASCADE");
    }
 
-   protected UserEntity criarUser(String email, Role role) {
+   protected UserEntity createUser(String email, Role role) {
       UserEntity user = new UserEntity();
       user.setEmail(email);
       user.setPassword(passwordEncoder.encode("senha12345"));
@@ -48,7 +61,7 @@ public abstract class AbstractIntegrationTest {
       return userRepository.saveAndFlush(user);
    }
 
-   protected NoteEntity criarNota(String title, String content, UserEntity owner) {
+   protected NoteEntity createNote(String title, String content, UserEntity owner) {
       NoteEntity nota = new NoteEntity();
       nota.setTitle(title);
       nota.setContent(content);
