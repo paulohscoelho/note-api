@@ -17,6 +17,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +64,115 @@ class NoteServiceTest {
   }
 
   @Nested
+  @DisplayName("getNotes()")
+  class GetNotes {
+
+    @Test
+    @DisplayName("deve retornar página de notas com filtro quando termo de busca é fornecido")
+    void deveRetornarPaginaComFiltro_quandoSearchFornecido() {
+      Pageable pageable = PageRequest.of(0, 10);
+      String search = "java";
+
+      NoteEntity nota = new NoteEntity();
+      nota.setId(1L);
+      NoteResponse response = new NoteResponse(1L, "java", "conteudo", null, null);
+
+      Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
+
+      when(noteRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(search, search, pageable))
+          .thenReturn(paginas);
+      when(noteMapper.toResponse(nota)).thenReturn(response);
+
+      Page<NoteResponse> resultado = noteService.getNotes(search, pageable);
+
+      assertThat(resultado.getContent()).hasSize(1);
+      assertThat(resultado.getContent().get(0)).isEqualTo(response);
+      verify(noteRepository).findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(search, search, pageable);
+      verify(noteRepository, never()).findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("deve retornar todas as notas paginadas quando termo de busca é nulo ou em branco")
+    void deveRetornarTodasPaginadas_quandoSearchNuloOuEmBranco() {
+      Pageable pageable = PageRequest.of(0, 10);
+
+      NoteEntity nota = new NoteEntity();
+      nota.setId(1L);
+      NoteResponse response = new NoteResponse(1L, "titulo", "conteudo", null, null);
+
+      Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
+
+      when(noteRepository.findAll(pageable)).thenReturn(paginas);
+      when(noteMapper.toResponse(nota)).thenReturn(response);
+
+      Page<NoteResponse> resultado = noteService.getNotes("   ", pageable);
+
+      assertThat(resultado.getContent()).hasSize(1);
+      verify(noteRepository).findAll(pageable);
+      verify(noteRepository, never()).findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(anyString(), anyString(), any(Pageable.class));
+    }
+  }
+
+  @Nested
+  @DisplayName("getUserNotes()")
+  class GetUserNotes {
+
+    @Test
+    @DisplayName("deve retornar notas do usuário com filtro quando termo de busca é fornecido")
+    void deveRetornarNotasDoUserComFiltro_quandoSearchFornecido() {
+      Pageable pageable = PageRequest.of(0, 10);
+      String search = "spring";
+
+      NoteEntity nota = new NoteEntity();
+      nota.setId(1L);
+      nota.setUser(userComum);
+      NoteResponse response = new NoteResponse(1L, "spring", "conteudo", null, null);
+
+      Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
+
+      when(noteRepository.findByUserUuidAndTitleContainingIgnoreCaseOrUserUuidAndContentContainingIgnoreCase(
+          userId, search, userId, search, pageable
+      )).thenReturn(paginas);
+      when(noteMapper.toResponse(nota)).thenReturn(response);
+
+      Page<NoteResponse> resultado = noteService.getUserNotes(userId, search, pageable);
+
+      assertThat(resultado.getContent()).hasSize(1);
+      assertThat(resultado.getContent().get(0)).isEqualTo(response);
+      verify(noteRepository).findByUserUuidAndTitleContainingIgnoreCaseOrUserUuidAndContentContainingIgnoreCase(
+          userId, search, userId, search, pageable
+      );
+      verify(noteRepository, never()).findByUserUuid(any(UUID.class), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("deve retornar todas as notas do usuário paginadas quando termo de busca é nulo ou em branco")
+    void deveRetornarTodasNotasDoUser_quandoSearchNuloOuEmBranco() {
+      Pageable pageable = PageRequest.of(0, 10);
+
+      NoteEntity nota = new NoteEntity();
+      nota.setId(1L);
+      nota.setUser(userComum);
+      NoteResponse response = new NoteResponse(1L, "titulo", "conteudo", null, null);
+
+      Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
+
+      when(noteRepository.findByUserUuid(userId, pageable)).thenReturn(paginas);
+      when(noteMapper.toResponse(nota)).thenReturn(response);
+
+      Page<NoteResponse> resultado = noteService.getUserNotes(userId, null, pageable);
+
+      assertThat(resultado.getContent()).hasSize(1);
+      verify(noteRepository).findByUserUuid(userId, pageable);
+      verify(noteRepository, never()).findByUserUuidAndTitleContainingIgnoreCaseOrUserUuidAndContentContainingIgnoreCase(
+          any(UUID.class), anyString(), any(UUID.class), anyString(), any(Pageable.class)
+      );
+    }
+  }
+
+
+
+  @Nested
   @DisplayName("createNote()")
   class CreateNote {
 
@@ -73,12 +186,12 @@ class NoteServiceTest {
       notaMapeada.setTitle("meu título");
       notaMapeada.setContent("meu conteúdo");
 
-      NoteResponse respostaEsperada = new NoteResponse(
+      NoteResponse response = new NoteResponse(
           1L, "meu título", "meu conteúdo", null, null);
 
       when(noteMapper.toEntity(any(NoteRequest.class))).thenReturn(notaMapeada);
       when(noteRepository.save(any(NoteEntity.class))).thenReturn(notaMapeada);
-      when(noteMapper.toResponse(notaMapeada)).thenReturn(respostaEsperada);
+      when(noteMapper.toResponse(notaMapeada)).thenReturn(response);
 
       // Act
       noteService.createNote(request, userComum);
@@ -92,8 +205,8 @@ class NoteServiceTest {
     }
 
     @Test
-    @DisplayName("deve retornar a resposta mapeada")
-    void deveRetornarRespostaMapeada() {
+    @DisplayName("deve retornar a response mapeada")
+    void deveRetornarresponseMapeada() {
       // Arrange
       NoteRequest request = new NoteRequest("meu título", "meu conteúdo");
 
@@ -101,18 +214,18 @@ class NoteServiceTest {
       notaMapeada.setTitle("meu título");
       notaMapeada.setContent("meu conteúdo");
 
-      NoteResponse respostaEsperada = new NoteResponse(
+      NoteResponse response = new NoteResponse(
           1L, "meu título", "meu conteúdo", null, null);
 
       when(noteMapper.toEntity(any(NoteRequest.class))).thenReturn(notaMapeada);
       when(noteRepository.save(any(NoteEntity.class))).thenReturn(notaMapeada);
-      when(noteMapper.toResponse(notaMapeada)).thenReturn(respostaEsperada);
+      when(noteMapper.toResponse(notaMapeada)).thenReturn(response);
 
       // Act
       NoteResponse resultado = noteService.createNote(request, userComum);
 
       // Assert
-      assertThat(resultado).isEqualTo(respostaEsperada);
+      assertThat(resultado).isEqualTo(response);
     }
   }
 
@@ -127,14 +240,14 @@ class NoteServiceTest {
       NoteEntity notaDoUsuario = new NoteEntity();
       notaDoUsuario.setId(1L);
       notaDoUsuario.setUser(userComum);
-      NoteResponse respostaEsperada = new NoteResponse(1L, "title", "content", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", null, null);
 
       when(noteRepository.findByIdAndUserUuid(1L, userId)).thenReturn(Optional.of(notaDoUsuario));
-      when(noteMapper.toResponse(notaDoUsuario)).thenReturn(respostaEsperada);
+      when(noteMapper.toResponse(notaDoUsuario)).thenReturn(response);
 
       NoteResponse resultado = noteService.findById(1L, userComum);
 
-      assertThat(resultado).isEqualTo(respostaEsperada);
+      assertThat(resultado).isEqualTo(response);
       verify(noteRepository).findByIdAndUserUuid(1L, userId);
       verify(noteRepository, never()).findById(any());
     }
@@ -145,14 +258,14 @@ class NoteServiceTest {
       NoteEntity notaDeOutroUser = new NoteEntity();
       notaDeOutroUser.setId(1L);
       notaDeOutroUser.setUser(userComum);
-      NoteResponse respostaEsperada = new NoteResponse(1L, "title", "content", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", null, null);
 
       when(noteRepository.findById(1L)).thenReturn(Optional.of(notaDeOutroUser));
-      when(noteMapper.toResponse(notaDeOutroUser)).thenReturn(respostaEsperada);
+      when(noteMapper.toResponse(notaDeOutroUser)).thenReturn(response);
 
       NoteResponse resultado = noteService.findById(1L, admin);
 
-      assertThat(resultado).isEqualTo(respostaEsperada);
+      assertThat(resultado).isEqualTo(response);
       verify(noteRepository).findById(1L);
       verify(noteRepository, never()).findByIdAndUserUuid(any(), any());
     }
@@ -199,17 +312,17 @@ class NoteServiceTest {
       nota2.setId(2L);
       nota2.setUser(userComum);
 
-      NoteResponse resposta1 = new NoteResponse(1L, "n1", "c1", null, null);
-      NoteResponse resposta2 = new NoteResponse(2L, "n2", "c2", null, null);
+      NoteResponse response1 = new NoteResponse(1L, "n1", "c1", null, null);
+      NoteResponse response2 = new NoteResponse(2L, "n2", "c2", null, null);
 
       when(noteRepository.findByUserUuid(userId)).thenReturn(List.of(nota1, nota2));
-      when(noteMapper.toResponse(nota1)).thenReturn(resposta1);
-      when(noteMapper.toResponse(nota2)).thenReturn(resposta2);
+      when(noteMapper.toResponse(nota1)).thenReturn(response1);
+      when(noteMapper.toResponse(nota2)).thenReturn(response2);
 
       List<NoteResponse> resultado = noteService.findAllByUserUuid(userId);
 
       assertThat(resultado).hasSize(2);
-      assertThat(resultado).containsExactly(resposta1, resposta2);
+      assertThat(resultado).containsExactly(response1, response2);
       verify(noteRepository).findByUserUuid(userId);
     }
   }
@@ -266,13 +379,13 @@ class NoteServiceTest {
 
       NoteRequest request = new NoteRequest("título novo", "conteúdo novo");
 
-      NoteResponse respostaEsperada = new NoteResponse(
+      NoteResponse response = new NoteResponse(
           1L, "título novo", "conteúdo novo", null, null);
 
       when(noteRepository.findByIdAndUserUuid(1L, userId))
           .thenReturn(Optional.of(notaExistente));
       when(noteRepository.save(any(NoteEntity.class))).thenReturn(notaExistente);
-      when(noteMapper.toResponse(notaExistente)).thenReturn(respostaEsperada);
+      when(noteMapper.toResponse(notaExistente)).thenReturn(response);
 
       // Act
       noteService.updateNote(1L, request, userComum);
@@ -284,8 +397,8 @@ class NoteServiceTest {
     }
 
     @Test
-    @DisplayName("deve retornar a resposta mapeada da nota atualizada")
-    void deveRetornarRespostaMapeada() {
+    @DisplayName("deve retornar a response mapeada da nota atualizada")
+    void deveRetornarresponseMapeada() {
 
       NoteEntity notaExistente = new NoteEntity();
       notaExistente.setId(1L);
@@ -293,17 +406,17 @@ class NoteServiceTest {
 
       NoteRequest request = new NoteRequest("título novo", "conteúdo novo");
 
-      NoteResponse respostaEsperada = new NoteResponse(
+      NoteResponse response = new NoteResponse(
           1L, "título novo", "conteúdo novo", null, null);
 
       when(noteRepository.findByIdAndUserUuid(1L, userId))
           .thenReturn(Optional.of(notaExistente));
       when(noteRepository.save(any(NoteEntity.class))).thenReturn(notaExistente);
-      when(noteMapper.toResponse(notaExistente)).thenReturn(respostaEsperada);
+      when(noteMapper.toResponse(notaExistente)).thenReturn(response);
 
       NoteResponse resultado = noteService.updateNote(1L, request, userComum);
 
-      assertThat(resultado).isEqualTo(respostaEsperada);
+      assertThat(resultado).isEqualTo(response);
     }
 
     @Test
