@@ -6,12 +6,15 @@ import notesapi.note.dto.NoteRequest;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.service.NoteService;
 import notesapi.user.entity.UserEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @RequestMapping("/notes")
@@ -35,9 +38,13 @@ public class NoteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteResponse>> getAllNotes(@AuthenticationPrincipal UserEntity user){
-        List<NoteResponse> allNotes = service.findAllByUserUuid(user.getUuid());
-        return ResponseEntity.ok(allNotes);
+    public ResponseEntity<Page<NoteResponse>> getAllNotes(
+        @RequestParam(required = false) String search,
+        @PageableDefault(page = 0, size = 10, sort = "title") Pageable pageable,
+        @AuthenticationPrincipal UserEntity user) {
+
+        Page<NoteResponse> notes = service.getUserNotes(user.getUuid(), search, pageable);
+        return ResponseEntity.ok(notes);
     }
 
     @PutMapping("/{id}")
