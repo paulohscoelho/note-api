@@ -1,6 +1,8 @@
 package notesapi.user.service;
 
 import notesapi.common.exception.RecursoNaoEncontradoException;
+import notesapi.common.exception.RegraNegocioException;
+import notesapi.user.dto.UserRequest;
 import notesapi.user.dto.UserResponse;
 import notesapi.user.dto.UserWithNotesResponse;
 import notesapi.user.entity.UserEntity;
@@ -9,27 +11,31 @@ import notesapi.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import notesapi.common.exception.RegraNegocioException;
-import notesapi.user.dto.UserRequest;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 @ExtendWith(MockitoExtension.class)
+@DisplayName("UserService")
 class UserServiceTest {
+
   @Mock
   private UserRepository userRepository;
 
@@ -47,7 +53,6 @@ class UserServiceTest {
   private UserResponse userResponse;
   private UserWithNotesResponse userWithNotesResponse;
 
-
   @BeforeEach
   void setUp(){
     userUuid = UUID.randomUUID();
@@ -59,6 +64,49 @@ class UserServiceTest {
 
     userResponse = new UserResponse(userUuid, "joao@test.com");
     userWithNotesResponse = new UserWithNotesResponse(userUuid, "joao@test.com", List.of());
+  }
+
+  @Nested
+  @DisplayName("getUsers")
+  class GetUsers {
+
+    @Test
+    @DisplayName("deve retornar pagina de usuarios com filtro quando email é fornecido")
+    void deveRetornarPaginaComFiltro_quandoEmailFornecido() {
+      Pageable pageable = PageRequest.of(0, 10);
+      String search = "joao";
+
+      Page<UserEntity> paginaEntidades = new PageImpl<>(List.of(userEntity), pageable, 1);
+
+      when(userRepository.findByEmailContainingIgnoreCase(search, pageable))
+          .thenReturn(paginaEntidades);
+      when(userMapper.toResponse(userEntity)).thenReturn(userResponse);
+
+      Page<UserResponse> resultado = userService.getUsers(search, pageable);
+
+      assertThat(resultado.getContent()).hasSize(1);
+      assertThat(resultado.getContent().get(0)).isEqualTo(userResponse);
+      verify(userRepository).findByEmailContainingIgnoreCase(search, pageable);
+      verify(userRepository, never()).findAll(any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("deve retornar todos os usuarios paginados quando email é nulo ou em branco")
+    void deveRetornarTodosPaginados_quandoEmailNuloOuEmBranco() {
+      Pageable pageable = PageRequest.of(0, 10);
+
+      Page<UserEntity> paginaEntidades = new PageImpl<>(List.of(userEntity), pageable, 1);
+
+      when(userRepository.findAll(pageable)).thenReturn(paginaEntidades);
+      when(userMapper.toResponse(userEntity)).thenReturn(userResponse);
+
+      Page<UserResponse> resultado = userService.getUsers("   ", pageable);
+
+      assertThat(resultado.getContent()).hasSize(1);
+      assertThat(resultado.getContent().get(0)).isEqualTo(userResponse);
+      verify(userRepository).findAll(pageable);
+      verify(userRepository, never()).findByEmailContainingIgnoreCase(anyString(), any(Pageable.class));
+    }
   }
 
   @Nested
@@ -118,6 +166,7 @@ class UserServiceTest {
       verifyNoInteractions(passwordEncoder);
     }
   }
+
   @Nested
   @DisplayName("getUserWithNotes")
   class GetUserWithNotes{
@@ -151,7 +200,7 @@ class UserServiceTest {
 
   @Nested
   @DisplayName("getUserById")
-  class getUserById{
+  class GetUserById{
     @Test
     @DisplayName("deve retornar o UserResponse do usuario encontrado")
     void deveRetornarUserResponse(){
@@ -181,7 +230,7 @@ class UserServiceTest {
 
   @Nested
   @DisplayName("getUserByEmail")
-  class getUserByEmail{
+  class GetUserByEmail{
     @Test
     @DisplayName("deve retornar o UserResponse quando o email existir")
     void deveRetornarUserResponse(){
@@ -207,7 +256,6 @@ class UserServiceTest {
 
       verify(userRepository).findByEmail(email);
       verifyNoInteractions(userMapper);
-
     }
   }
 
