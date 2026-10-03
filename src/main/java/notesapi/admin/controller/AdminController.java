@@ -1,11 +1,9 @@
 package notesapi.admin.controller;
 
 import lombok.RequiredArgsConstructor;
-import notesapi.admin.dto.AdminUserResponse;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.service.NoteService;
 import notesapi.user.dto.UserResponse;
-import notesapi.user.repository.UserRepository;
 import notesapi.user.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +20,6 @@ import java.util.UUID;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
-  private final UserRepository userRepository;
   private final UserService userService;
   private final NoteService noteService;
 
