@@ -34,6 +34,29 @@ class UserControllerIT extends AbstractIntegrationTest {
    }
 
    @Nested
+   @DisplayName("GET /users/me")
+   class GetMe {
+
+      @Test
+      @DisplayName("deve retornar o user autenticado")
+      void deveRetornarUserAutenticado() throws Exception {
+         mockMvc.perform(get("/users/me")
+                 .header("Authorization", "Bearer " + tokenJorge))
+             .andExpect(status().isOk())
+             .andExpect(jsonPath("$.uuid").value(jorge.getUuid().toString()))
+             .andExpect(jsonPath("$.email").value("jorge@test.com"))
+             .andExpect(jsonPath("$.role").value("USER"));
+      }
+
+      @Test
+      @DisplayName("deve retornar 403 quando não autenticado")
+      void deveRetornar403_quandoAnonimo() throws Exception {
+         mockMvc.perform(get("/users/me"))
+             .andExpect(status().isForbidden());
+      }
+   }
+
+   @Nested
    @DisplayName("POST /users")
    class CreateUser {
 
