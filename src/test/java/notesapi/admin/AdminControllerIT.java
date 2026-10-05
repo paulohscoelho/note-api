@@ -12,6 +12,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.http.MediaType;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 
 @DisplayName("AdminController (integração)")
 class AdminControllerIT extends AbstractIntegrationTest {
@@ -27,6 +30,92 @@ class AdminControllerIT extends AbstractIntegrationTest {
       userComum = createUser("user@test.com", Role.USER);
       tokenAdmin = gerarToken(admin);
       tokenUser = gerarToken(userComum);
+   }
+
+   @Nested
+   @DisplayName("PATCH /admin/users/{uuid}/role")
+   class UpdateRole {
+
+      @Test
+      @DisplayName("deve retornar 200 e role atualizada quando ADMIN muda role de outro user")
+      void deveRetornar200_quandoAdmin() throws Exception {
+         String json = """
+                    {
+                      "role": "ADMIN"
+                    }
+                    """;
+
+         mockMvc.perform(patch("/admin/users/" + userComum.getUuid() + "/role")
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .content(json)
+                 .header("Authorization", "Bearer " + tokenAdmin))
+             .andExpect(status().isOk())
+             .andExpect(jsonPath("$.role").value("ADMIN"))
+             .andExpect(jsonPath("$.email").value("user@test.com"));
+      }
+
+      @Test
+      @DisplayName("deve retornar 409 quando ADMIN tenta mudar a própria role")
+      void deveRetornar409_quandoMudarPropriaRole() throws Exception {
+         String json = """
+                    {
+                      "role": "USER"
+                    }
+                    """;
+
+         mockMvc.perform(patch("/admin/users/" + admin.getUuid() + "/role")
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .content(json)
+                 .header("Authorization", "Bearer " + tokenAdmin))
+             .andExpect(status().isConflict());
+      }
+
+      @Test
+      @DisplayName("deve retornar 403 quando USER tenta mudar role")
+      void deveRetornar403_quandoUser() throws Exception {
+         String json = """
+                    {
+                      "role": "ADMIN"
+                    }
+                    """;
+
+         mockMvc.perform(patch("/admin/users/" + userComum.getUuid() + "/role")
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .content(json)
+                 .header("Authorization", "Bearer " + tokenUser))
+             .andExpect(status().isForbidden());
+      }
+
+      @Test
+      @DisplayName("deve retornar 403 quando não autenticado")
+      void deveRetornar403_quandoAnonimo() throws Exception {
+         String json = """
+                    {
+                      "role": "ADMIN"
+                    }
+                    """;
+
+         mockMvc.perform(patch("/admin/users/" + userComum.getUuid() + "/role")
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .content(json))
+             .andExpect(status().isForbidden());
+      }
+
+      @Test
+      @DisplayName("deve retornar 400 quando role é inválida")
+      void deveRetornar400_quandoRoleInvalida() throws Exception {
+         String json = """
+                    {
+                      "role": "SUPER_ADMIN"
+                    }
+                    """;
+
+         mockMvc.perform(patch("/admin/users/" + userComum.getUuid() + "/role")
+                 .contentType(MediaType.APPLICATION_JSON)
+                 .content(json)
+                 .header("Authorization", "Bearer " + tokenAdmin))
+             .andExpect(status().isBadRequest());
+      }
    }
 
    @Nested
