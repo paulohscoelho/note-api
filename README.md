@@ -153,6 +153,16 @@ Crie um arquivo `.env` a partir do `.env.example`. Ele contém dados sensíveis 
 |---|---|---|---|
 | GET | `/actuator/health` | Health check da aplicação | público |
 
+## 📖 Documentação da API
+
+A API tem documentação interativa via **Swagger UI** (OpenAPI 3):
+
+- **Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- **OpenAPI spec (JSON):** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
+
+> ⚠️ O botão **"Authorize"** do Swagger UI tem um [bug conhecido](https://github.com/springdoc/springdoc-openapi/issues/3374) com Spring Boot 4 + springdoc 3.x. **Para testar endpoints autenticados**, use o Insomnia/curl.
+
+
 ## 🧪 Testes
 
 Rode a suíte com:
