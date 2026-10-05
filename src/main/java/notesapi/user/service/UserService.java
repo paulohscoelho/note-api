@@ -1,15 +1,18 @@
 package notesapi.user.service;
 
 import lombok.RequiredArgsConstructor;
+import notesapi.admin.dto.AdminUserResponse;
 import notesapi.common.exception.RecursoNaoEncontradoException;
 import notesapi.common.exception.RegraNegocioException;
 import notesapi.user.dto.MeResponse;
 import notesapi.user.dto.UserRequest;
 import notesapi.user.dto.UserResponse;
 import notesapi.user.dto.UserWithNotesResponse;
+import notesapi.user.entity.Role;
 import notesapi.user.entity.UserEntity;
 import notesapi.user.mapper.UserMapper;
 import notesapi.user.repository.UserRepository;
+import org.apache.catalina.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,6 +28,18 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public AdminUserResponse updateRole(UUID targetUuid, Role newRole, UserEntity currentUser){
+        if (targetUuid.equals(currentUser.getUuid())){
+            throw new RegraNegocioException("Não é possivel alterar a própria role.");
+        }
+        UserEntity target = repository.findById(targetUuid)
+            .orElseThrow(()-> new RecursoNaoEncontradoException("Usuário não encontrado."));
+        target.setRole(newRole);
+        UserEntity saved = repository.save(target);
+        return AdminUserResponse.from(saved);
+    }
 
     @Transactional(readOnly = true)
     public MeResponse getMe(UUID uuid){

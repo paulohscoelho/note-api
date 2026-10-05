@@ -1,6 +1,11 @@
 package notesapi.admin.controller;
 
+import jakarta.validation.Valid;
+import notesapi.admin.dto.RoleUpdateRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import notesapi.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
+import notesapi.admin.dto.AdminUserResponse;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.service.NoteService;
 import notesapi.user.dto.UserResponse;
@@ -23,6 +28,16 @@ public class AdminController {
   private final UserService userService;
   private final NoteService noteService;
 
+  @PatchMapping("/users/{uuid}/role")
+  public ResponseEntity<AdminUserResponse> updateRole(
+      @PathVariable UUID uuid,
+      @Valid @RequestBody RoleUpdateRequest request,
+      @AuthenticationPrincipal UserEntity currentUser) {
+
+    AdminUserResponse response = userService.updateRole(uuid, request.role(), currentUser);
+    return ResponseEntity.ok(response);
+  }
+
   @GetMapping("/users")
   public ResponseEntity<Page<UserResponse>> listAllUsers(
       @RequestParam(required = false) String search,
@@ -33,7 +48,7 @@ public class AdminController {
   }
 
   @GetMapping("/users/{uuid}")
-  public ResponseEntity<UserResponse> getById(@PathVariable UUID uuid) {
+  public ResponseEntity<UserResponse> getUserById(@PathVariable UUID uuid) {
     return ResponseEntity.ok(userService.getUserById(uuid));
   }
 
