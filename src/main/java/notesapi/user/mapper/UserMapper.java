@@ -1,6 +1,7 @@
 package notesapi.user.mapper;
 
 import notesapi.note.mapper.NoteMapper;
+import notesapi.user.dto.MeResponse;
 import notesapi.user.dto.UserRequest;
 import notesapi.user.dto.UserResponse;
 import notesapi.user.dto.UserWithNotesResponse;
@@ -21,4 +22,6 @@ public interface UserMapper {
     UserResponse toResponse(UserEntity entity);
 
     UserWithNotesResponse toWithNotesResponse(UserEntity entity);
+
+    MeResponse toMeResponse(UserEntity entity);
 }

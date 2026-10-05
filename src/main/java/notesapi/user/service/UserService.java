@@ -3,6 +3,7 @@ package notesapi.user.service;
 import lombok.RequiredArgsConstructor;
 import notesapi.common.exception.RecursoNaoEncontradoException;
 import notesapi.common.exception.RegraNegocioException;
+import notesapi.user.dto.MeResponse;
 import notesapi.user.dto.UserRequest;
 import notesapi.user.dto.UserResponse;
 import notesapi.user.dto.UserWithNotesResponse;
@@ -24,6 +25,13 @@ public class UserService {
     private final UserRepository repository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
+
+    @Transactional(readOnly = true)
+    public MeResponse getMe(UUID uuid){
+        UserEntity user = repository.findById(uuid)
+            .orElseThrow(()->new RecursoNaoEncontradoException("Usuário não encontrado."));
+        return mapper.toMeResponse(user);
+    }
 
     @Transactional(readOnly = true)
     public Page<UserResponse> getUsers(String search, Pageable pageable) {
