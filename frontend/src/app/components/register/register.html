@@ -1,0 +1,47 @@
+<div class="register-container">
+  <div class="register-card">
+    <h1 class="register-title">Criar Conta</h1>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          placeholder="seu@email.com"
+          [disabled]="loading"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="mínimo 8 caracteres"
+          [disabled]="loading"
+          required
+          minlength="8"
+        />
+      </div>
+
+      @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Cadastrando...' : 'Cadastrar' }}
+      </button>
+    </form>
+
+    <p class="login-link">
+      Já tem conta?
+      <a routerLink="/login">Faça login</a>
+    </p>
+  </div>
+</div>
