@@ -3,7 +3,7 @@
 
   <div class="navbar-actions">
     @if (isLoggedIn()) {
-    <span class="navbar-user">{{ getUserEmail() }}</span>
+    <span class="navbar-user">{{ userEmail() || 'usuário' }}</span>
     <button class="navbar-btn" (click)="logout()">Sair</button>
     } @else {
     <a routerLink="/login" class="navbar-btn">Entrar</a>
