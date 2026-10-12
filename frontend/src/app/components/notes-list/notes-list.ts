@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject,ChangeDetectorRef  } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -17,6 +17,7 @@ export class NotesList implements OnInit {
   private readonly noteService = inject(NoteService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   notes: Note[] = [];
   loading: boolean = false;
@@ -47,6 +48,7 @@ export class NotesList implements OnInit {
         this.isFirstPage = page.first;
         this.isLastPage = page.last;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
