@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -16,6 +16,7 @@ export class NoteForm implements OnInit {
   private readonly noteService = inject(NoteService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   noteId: number | null = null;
   isEditMode: boolean = false;
@@ -45,10 +46,12 @@ export class NoteForm implements OnInit {
         this.title = note.title;
         this.content = note.content;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
         this.errorMessage = 'Erro ao carregar nota.';
+        this.cdr.detectChanges();
         console.error('Erro ao carregar:', err);
       }
     });
@@ -78,6 +81,7 @@ export class NoteForm implements OnInit {
       this.noteService.update(this.noteId, request).subscribe({
         next: () => {
           this.loading = false;
+          this.cdr.detectChanges();
           this.router.navigate(['/notes']);
         },
         error: (err) => this.handleError(err, 'Erro ao atualizar nota.')
@@ -86,6 +90,7 @@ export class NoteForm implements OnInit {
       this.noteService.create(request).subscribe({
         next: () => {
           this.loading = false;
+          this.cdr.detectChanges();
           this.router.navigate(['/notes']);
         },
         error: (err) => this.handleError(err, 'Erro ao criar nota.')
@@ -102,6 +107,7 @@ export class NoteForm implements OnInit {
       this.errorMessage = fallbackMessage;
     }
 
+    this.cdr.detectChanges();
     console.error('Erro no formulário:', err);
   }
 }

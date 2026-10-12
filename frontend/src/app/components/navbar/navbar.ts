@@ -13,13 +13,8 @@ export class Navbar {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  isLoggedIn(): boolean {
-    return this.authService.isLoggedIn();
-  }
-
-  getUserEmail(): string {
-    return 'usuário';
-  }
+  readonly isLoggedIn = this.authService.isLoggedIn;
+  readonly userEmail = this.authService.userEmail;
 
   logout(): void {
     this.authService.logout();
