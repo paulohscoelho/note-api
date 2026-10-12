@@ -1,0 +1,49 @@
+<div class="form-container">
+  <div class="form-card">
+    <h1>{{ isEditMode ? 'Editar Nota' : 'Nova Nota' }}</h1>
+
+    @if (loading && isEditMode) {
+    <p class="info">Carregando nota...</p>
+    }
+
+    <form (ngSubmit)="onSubmit()" #noteForm="ngForm">
+      <div class="form-group">
+        <label for="title">Título</label>
+        <input
+          id="title"
+          type="text"
+          name="title"
+          [(ngModel)]="title"
+          placeholder="Título da nota"
+          maxlength="100"
+          [disabled]="loading"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="content">Conteúdo</label>
+        <textarea
+          id="content"
+          name="content"
+          [(ngModel)]="content"
+          placeholder="Escreva sua nota aqui..."
+          rows="8"
+          [disabled]="loading"
+          required
+        ></textarea>
+      </div>
+
+      @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      <div class="form-actions">
+        <a routerLink="/notes" class="btn-cancel">Cancelar</a>
+        <button type="submit" class="btn-primary" [disabled]="loading">
+          {{ loading ? 'Salvando...' : (isEditMode ? 'Salvar' : 'Criar Nota') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
