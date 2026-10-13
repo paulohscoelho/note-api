@@ -3,11 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, switchMap, map } from 'rxjs';
 import { LoginRequest, LoginResponse, RegisterRequest } from '../models/auth.model';
 import { MeResponse } from '../models/user.model';
+import { environment } from '../../environments/environment'; // <--- NOVO IMPORT
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private readonly API_URL = 'http://localhost:8080';
+  private readonly API_URL = environment.apiUrl;
   private readonly TOKEN_KEY = 'auth_token';
 
   private readonly tokenSignal = signal<string | null>(localStorage.getItem(this.TOKEN_KEY));
