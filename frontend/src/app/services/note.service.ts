@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Note, NoteRequest, Page } from '../models/note.model';
-
+import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class NoteService {
 
-  private readonly API_URL = 'http://localhost:8080';
+  private readonly API_URL = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
