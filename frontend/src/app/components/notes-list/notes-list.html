@@ -53,4 +53,12 @@
     }
   </div>
 
+  @if (totalPages > 0) {
+  <div class="pagination">
+    <button (click)="previousPage()" [disabled]="isFirstPage || loading">Anterior</button>
+    <span>Página {{ currentPage + 1 }} de {{ totalPages }} ({{ totalElements }} notas)</span>
+    <button (click)="nextPage()" [disabled]="isLastPage || loading">Próxima</button>
+  </div>
+  }
+
 </div>
