@@ -1,0 +1,1 @@
+ALTER TABLE tb_notes ADD COLUMN due_date TIMESTAMP;
