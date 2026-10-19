@@ -49,15 +49,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UserResponse> getUsers(String search, Pageable pageable) {
+    public Page<AdminUserResponse> getUsers(String search, Pageable pageable) {
         if (search != null && !search.isBlank()) {
             return repository
                 .findByEmailContainingIgnoreCase(search, pageable)
-                .map(mapper::toResponse);
+                .map(AdminUserResponse::from);
         }
         return repository
             .findAll(pageable)
-            .map(mapper::toResponse);
+            .map(AdminUserResponse::from);
     }
 
     @Transactional

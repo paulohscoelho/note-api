@@ -3,11 +3,14 @@
 
   <div class="navbar-actions">
     @if (isLoggedIn()) {
+    @if (userRole() === 'ADMIN') {
+    <a routerLink="/admin" class="navbar-btn" style="margin-right: 15px;">Painel Admin</a>
+    }
     <span class="navbar-user">{{ userEmail() || 'Carregando...' }}</span>
     <button class="navbar-btn" (click)="logout()">Sair</button>
     } @else {
     @if (router.url !== '/login' && router.url !== '/register') {
-      <a routerLink="/login" class="navbar-btn">Entrar</a>
+    <a routerLink="/login" class="navbar-btn">Entrar</a>
     }
     }
   </div>

@@ -2,8 +2,8 @@ import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, switchMap, map } from 'rxjs';
 import { LoginRequest, LoginResponse, RegisterRequest } from '../models/auth.model';
-import { MeResponse } from '../models/user.model';
-import { environment } from '../../environments/environment'; // <--- NOVO IMPORT
+import { MeResponse, Role } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -13,9 +13,11 @@ export class AuthService {
 
   private readonly tokenSignal = signal<string | null>(localStorage.getItem(this.TOKEN_KEY));
   private readonly userEmailSignal = signal<string | null>(null);
+  private readonly userRoleSignal = signal<Role | null>(null);
 
   readonly isLoggedIn = computed(() => this.tokenSignal() !== null);
   readonly userEmail = this.userEmailSignal.asReadonly();
+  readonly userRole = this.userRoleSignal.asReadonly();
 
   constructor(private http: HttpClient) {}
 
@@ -27,6 +29,7 @@ export class AuthService {
           this.getMe().pipe(
             map(me => {
               this.userEmailSignal.set(me.email);
+              this.userRoleSignal.set(me.role);
               return loginResponse;
             })
           )
@@ -44,15 +47,18 @@ export class AuthService {
 
   loadCurrentUser(): Observable<MeResponse> {
     return this.getMe().pipe(
-      tap(me => this.userEmailSignal.set(me.email))
+      tap(me => {
+        this.userEmailSignal.set(me.email);
+        this.userRoleSignal.set(me.role);
+      })
     );
   }
 
   logout(): void {
-    console.log('[AuthService] LOGOUT CHAMADO!');   // ← rastreia quem chama
     localStorage.removeItem(this.TOKEN_KEY);
     this.tokenSignal.set(null);
     this.userEmailSignal.set(null);
+    this.userRoleSignal.set(null);
   }
 
   getToken(): string | null {
@@ -60,7 +66,6 @@ export class AuthService {
   }
 
   private saveToken(token: string): void {
-    console.log('[AuthService] saveToken chamado');
     localStorage.setItem(this.TOKEN_KEY, token);
     this.tokenSignal.set(token);
   }

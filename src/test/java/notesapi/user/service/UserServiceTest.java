@@ -1,5 +1,6 @@
 package notesapi.user.service;
 
+import notesapi.admin.dto.AdminUserResponse;
 import notesapi.common.exception.RecursoNaoEncontradoException;
 import notesapi.common.exception.RegraNegocioException;
 import notesapi.user.dto.UserRequest;
@@ -80,12 +81,11 @@ class UserServiceTest {
 
       when(userRepository.findByEmailContainingIgnoreCase(search, pageable))
           .thenReturn(paginaEntidades);
-      when(userMapper.toResponse(userEntity)).thenReturn(userResponse);
 
-      Page<UserResponse> resultado = userService.getUsers(search, pageable);
+      Page<AdminUserResponse> resultado = userService.getUsers(search, pageable);
 
       assertThat(resultado.getContent()).hasSize(1);
-      assertThat(resultado.getContent().get(0)).isEqualTo(userResponse);
+      assertThat(resultado.getContent().get(0)).isEqualTo(AdminUserResponse.from(userEntity));
       verify(userRepository).findByEmailContainingIgnoreCase(search, pageable);
       verify(userRepository, never()).findAll(any(Pageable.class));
     }
@@ -98,12 +98,13 @@ class UserServiceTest {
       Page<UserEntity> paginaEntidades = new PageImpl<>(List.of(userEntity), pageable, 1);
 
       when(userRepository.findAll(pageable)).thenReturn(paginaEntidades);
-      when(userMapper.toResponse(userEntity)).thenReturn(userResponse);
 
-      Page<UserResponse> resultado = userService.getUsers("   ", pageable);
+      Page<AdminUserResponse> resultado = userService.getUsers("   ", pageable);
 
       assertThat(resultado.getContent()).hasSize(1);
-      assertThat(resultado.getContent().get(0)).isEqualTo(userResponse);
+      // AQUI: Compara com o AdminUserResponse gerado a partir da entidade
+      assertThat(resultado.getContent().get(0)).isEqualTo(AdminUserResponse.from(userEntity));
+
       verify(userRepository).findAll(pageable);
       verify(userRepository, never()).findByEmailContainingIgnoreCase(anyString(), any(Pageable.class));
     }
