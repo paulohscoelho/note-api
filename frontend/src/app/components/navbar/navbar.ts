@@ -1,6 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { Router } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -16,9 +15,9 @@ export class Navbar implements OnInit {
 
   readonly isLoggedIn = this.authService.isLoggedIn;
   readonly userEmail = this.authService.userEmail;
+  readonly userRole = this.authService.userRole;
 
   ngOnInit(): void {
-
     if (this.isLoggedIn() && !this.userEmail()) {
       this.authService.loadCurrentUser().subscribe();
     }

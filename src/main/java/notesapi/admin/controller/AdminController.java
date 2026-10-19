@@ -50,11 +50,11 @@ public class AdminController {
   @Operation(summary = "Listar todos os usuários",
       description = "Retorna uma página de usuários. Aceita filtro por email (search) e paginação.")
   @GetMapping("/users")
-  public ResponseEntity<Page<UserResponse>> listAllUsers(
+  public ResponseEntity<Page<AdminUserResponse>> listAllUsers(
       @RequestParam(required = false) String search,
       @PageableDefault(page = 0, size = 10, sort = "email") Pageable pageable) {
 
-    Page<UserResponse> users = userService.getUsers(search, pageable);
+    Page<AdminUserResponse> users = userService.getUsers(search, pageable);
     return ResponseEntity.ok(users);
   }
 
