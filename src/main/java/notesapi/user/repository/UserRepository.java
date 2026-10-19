@@ -1,5 +1,6 @@
 package notesapi.user.repository;
 
+import notesapi.user.entity.Role;
 import notesapi.user.entity.UserEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +18,6 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     boolean existsByEmail(String email);
 
     Page<UserEntity> findByEmailContainingIgnoreCase(String email, Pageable pageable);
+
+    long countByRole(Role role);
 }
