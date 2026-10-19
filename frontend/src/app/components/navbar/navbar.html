@@ -3,10 +3,12 @@
 
   <div class="navbar-actions">
     @if (isLoggedIn()) {
-    <span class="navbar-user">{{ userEmail() || 'usuário' }}</span>
+    <span class="navbar-user">{{ userEmail() || 'Carregando...' }}</span>
     <button class="navbar-btn" (click)="logout()">Sair</button>
     } @else {
-    <a routerLink="/login" class="navbar-btn">Entrar</a>
+    @if (router.url !== '/login' && router.url !== '/register') {
+      <a routerLink="/login" class="navbar-btn">Entrar</a>
+    }
     }
   </div>
 </nav>

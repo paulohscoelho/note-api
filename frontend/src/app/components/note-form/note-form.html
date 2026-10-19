@@ -34,6 +34,31 @@
         ></textarea>
       </div>
 
+      <div class="form-row">
+        <div class="form-group half">
+          <label for="priority">Prioridade</label>
+          <select id="priority" name="priority" [(ngModel)]="priority" [disabled]="loading">
+            <option [ngValue]="0">Normal</option>
+            <option [ngValue]="1">Baixa</option>
+            <option [ngValue]="2">Média</option>
+            <option [ngValue]="3">Alta</option>
+            <option [ngValue]="4">Urgente</option>
+            <option [ngValue]="5">Crítica</option>
+          </select>
+        </div>
+
+        <div class="form-group half">
+          <label for="dueDate">Data de Vencimento</label>
+          <input
+            id="dueDate"
+            type="datetime-local"
+            name="dueDate"
+            [(ngModel)]="dueDate"
+            [disabled]="loading"
+          />
+        </div>
+      </div>
+
       @if (errorMessage) {
       <div class="error-message">{{ errorMessage }}</div>
       }

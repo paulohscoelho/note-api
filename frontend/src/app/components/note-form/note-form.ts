@@ -23,6 +23,8 @@ export class NoteForm implements OnInit {
 
   title: string = '';
   content: string = '';
+  priority: number = 0;
+  dueDate: string | null = null;
 
   loading: boolean = false;
   errorMessage: string = '';
@@ -45,6 +47,8 @@ export class NoteForm implements OnInit {
       next: (note) => {
         this.title = note.title;
         this.content = note.content;
+        this.priority = note.priority || 0;
+        this.dueDate = note.dueDate ? note.dueDate.substring(0, 16) : null;
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -52,7 +56,6 @@ export class NoteForm implements OnInit {
         this.loading = false;
         this.errorMessage = 'Erro ao carregar nota.';
         this.cdr.detectChanges();
-        console.error('Erro ao carregar:', err);
       }
     });
   }
@@ -65,16 +68,13 @@ export class NoteForm implements OnInit {
       return;
     }
 
-    if (this.title.length > 100) {
-      this.errorMessage = 'O título deve ter no máximo 100 caracteres.';
-      return;
-    }
-
     this.loading = true;
 
     const request: NoteRequest = {
       title: this.title,
-      content: this.content
+      content: this.content,
+      priority: this.priority,
+      dueDate: this.dueDate ? this.dueDate + ':00' : null
     };
 
     if (this.isEditMode && this.noteId !== null) {
@@ -100,14 +100,7 @@ export class NoteForm implements OnInit {
 
   private handleError(err: HttpErrorResponse, fallbackMessage: string): void {
     this.loading = false;
-
-    if (err.status === 400) {
-      this.errorMessage = 'Dados inválidos. Verifique título e conteúdo.';
-    } else {
-      this.errorMessage = fallbackMessage;
-    }
-
+    this.errorMessage = fallbackMessage;
     this.cdr.detectChanges();
-    console.error('Erro no formulário:', err);
   }
 }

@@ -4,31 +4,25 @@
     <a routerLink="/notes/new" class="btn-new">+ Nova Nota</a>
   </div>
 
-  <div class="search-box">
+  <div class="search-box" style="display: flex; gap: 10px; align-items: center;">
     <input
       type="text"
       [(ngModel)]="search"
       (keyup.enter)="onSearch()"
       placeholder="Buscar por título ou conteúdo..."
       [disabled]="loading"
+      style="flex: 1;"
     />
     <button (click)="onSearch()" [disabled]="loading">Buscar</button>
-    @if (search) {
-    <button (click)="clearSearch()" [disabled]="loading">Limpar</button>
-    }
+
+    <select [(ngModel)]="sortOption" (change)="onSortChange()" [disabled]="loading" class="sort-select">
+      <option value="createdAt,desc">Mais recentes</option>
+      <option value="title,asc">Título (A-Z)</option>
+      <option value="priority,desc">Maior Prioridade</option>
+      <option value="priority,asc">Menor Prioridade</option>
+      <option value="dueDate,asc">Vencimento mais próximo</option>
+    </select>
   </div>
-
-  @if (loading) {
-  <p class="info">Carregando...</p>
-  }
-
-  @if (errorMessage) {
-  <div class="error-message">{{ errorMessage }}</div>
-  }
-
-  @if (!loading && notes.length === 0) {
-  <p class="info">Você ainda não tem notas. Crie a primeira!</p>
-  }
 
   <div class="notes-list">
     @for (note of notes; track note.id) {
@@ -36,6 +30,16 @@
       <div class="note-info">
         <h3>{{ note.title }}</h3>
         <p>{{ note.content }}</p>
+
+        <div class="note-metadata">
+          <span class="badge priority" [ngClass]="getPriorityClass(note.priority)">
+            Prioridade: {{ getPriorityLabel(note.priority) }}
+          </span>
+
+          @if (note.dueDate) {
+          <span class="badge due-date">Vence: {{ note.dueDate | date:'dd/MM/yyyy' }}</span>
+          }
+        </div>
       </div>
       <div class="note-actions">
         <a [routerLink]="['/notes', note.id, 'edit']" class="btn-edit">Editar</a>
@@ -49,11 +53,4 @@
     }
   </div>
 
-  @if (totalPages > 0) {
-  <div class="pagination">
-    <button (click)="previousPage()" [disabled]="isFirstPage || loading">Anterior</button>
-    <span>Página {{ currentPage + 1 }} de {{ totalPages }} ({{ totalElements }} notas)</span>
-    <button (click)="nextPage()" [disabled]="isLastPage || loading">Próxima</button>
-  </div>
-  }
 </div>

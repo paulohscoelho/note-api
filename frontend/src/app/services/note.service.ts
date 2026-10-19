@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Note, NoteRequest, Page } from '../models/note.model';
 import { environment } from '../../environments/environment';
+
 @Injectable({ providedIn: 'root' })
 export class NoteService {
 
@@ -10,11 +11,11 @@ export class NoteService {
 
   constructor(private http: HttpClient) {}
 
-  list(page: number = 0, size: number = 10, search?: string): Observable<Page<Note>> {
+  list(page: number = 0, size: number = 10, search?: string, sort: string = 'createdAt,desc'): Observable<Page<Note>> {
     let params = new HttpParams()
       .set('page', page)
       .set('size', size)
-      .set('sort', 'title,asc');
+      .set('sort', sort);
 
     if (search && search.trim()) {
       params = params.set('search', search.trim());
