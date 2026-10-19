@@ -75,7 +75,7 @@ class NoteServiceTest {
 
       NoteEntity nota = new NoteEntity();
       nota.setId(1L);
-      NoteResponse response = new NoteResponse(1L, "java", "conteudo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
 
@@ -98,7 +98,7 @@ class NoteServiceTest {
 
       NoteEntity nota = new NoteEntity();
       nota.setId(1L);
-      NoteResponse response = new NoteResponse(1L, "titulo", "conteudo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
 
@@ -126,7 +126,7 @@ class NoteServiceTest {
       NoteEntity nota = new NoteEntity();
       nota.setId(1L);
       nota.setUser(userComum);
-      NoteResponse response = new NoteResponse(1L, "spring", "conteudo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
 
@@ -153,7 +153,7 @@ class NoteServiceTest {
       NoteEntity nota = new NoteEntity();
       nota.setId(1L);
       nota.setUser(userComum);
-      NoteResponse response = new NoteResponse(1L, "titulo", "conteudo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       Page<NoteEntity> paginas = new PageImpl<>(List.of(nota), pageable, 1);
 
@@ -180,14 +180,13 @@ class NoteServiceTest {
     @DisplayName("deve atribuir o usuário autenticado como dono da nota")
     void deveAtribuirUserAutenticadoComoDono() {
       // Arrange
-      NoteRequest request = new NoteRequest("meu título", "meu conteúdo");
+      NoteRequest request = new NoteRequest("meu título", "meu conteúdo", 0, null);
 
       NoteEntity notaMapeada = new NoteEntity();
       notaMapeada.setTitle("meu título");
       notaMapeada.setContent("meu conteúdo");
 
-      NoteResponse response = new NoteResponse(
-          1L, "meu título", "meu conteúdo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "meu conteudo", 0, null, null, null);
 
       when(noteMapper.toEntity(any(NoteRequest.class))).thenReturn(notaMapeada);
       when(noteRepository.save(any(NoteEntity.class))).thenReturn(notaMapeada);
@@ -208,14 +207,13 @@ class NoteServiceTest {
     @DisplayName("deve retornar a response mapeada")
     void deveRetornarresponseMapeada() {
       // Arrange
-      NoteRequest request = new NoteRequest("meu título", "meu conteúdo");
+      NoteRequest request = new NoteRequest("meu título", "meu conteúdo" ,0, null);
 
       NoteEntity notaMapeada = new NoteEntity();
       notaMapeada.setTitle("meu título");
       notaMapeada.setContent("meu conteúdo");
 
-      NoteResponse response = new NoteResponse(
-          1L, "meu título", "meu conteúdo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "meu conteúdo", 0, null, null, null);
 
       when(noteMapper.toEntity(any(NoteRequest.class))).thenReturn(notaMapeada);
       when(noteRepository.save(any(NoteEntity.class))).thenReturn(notaMapeada);
@@ -240,7 +238,7 @@ class NoteServiceTest {
       NoteEntity notaDoUsuario = new NoteEntity();
       notaDoUsuario.setId(1L);
       notaDoUsuario.setUser(userComum);
-      NoteResponse response = new NoteResponse(1L, "title", "content", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       when(noteRepository.findByIdAndUserUuid(1L, userId)).thenReturn(Optional.of(notaDoUsuario));
       when(noteMapper.toResponse(notaDoUsuario)).thenReturn(response);
@@ -258,7 +256,7 @@ class NoteServiceTest {
       NoteEntity notaDeOutroUser = new NoteEntity();
       notaDeOutroUser.setId(1L);
       notaDeOutroUser.setUser(userComum);
-      NoteResponse response = new NoteResponse(1L, "title", "content", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       when(noteRepository.findById(1L)).thenReturn(Optional.of(notaDeOutroUser));
       when(noteMapper.toResponse(notaDeOutroUser)).thenReturn(response);
@@ -312,8 +310,8 @@ class NoteServiceTest {
       nota2.setId(2L);
       nota2.setUser(userComum);
 
-      NoteResponse response1 = new NoteResponse(1L, "n1", "c1", null, null);
-      NoteResponse response2 = new NoteResponse(2L, "n2", "c2", null, null);
+      NoteResponse response1 = new NoteResponse(1L, "n1", "c1", 0, null, null, null);
+      NoteResponse response2 = new NoteResponse(2L, "n2", "c2", 0, null, null, null);
 
       when(noteRepository.findByUserUuid(userId)).thenReturn(List.of(nota1, nota2));
       when(noteMapper.toResponse(nota1)).thenReturn(response1);
@@ -346,9 +344,9 @@ class NoteServiceTest {
       nota3.setId(3L);
       nota3.setUser(userComum);
 
-      NoteResponse r1 = new NoteResponse(1L, "n1", "c1", null, null);
-      NoteResponse r2 = new NoteResponse(2L, "n2", "c2", null, null);
-      NoteResponse r3 = new NoteResponse(3L, "n3", "c3", null, null);
+      NoteResponse r1 = new NoteResponse(1L, "n1", "c1", 0, null, null, null);
+      NoteResponse r2 = new NoteResponse(2L, "n2", "c2", 0, null, null, null);
+      NoteResponse r3 = new NoteResponse(3L, "n3", "c3", 0, null, null, null);
 
       when(noteRepository.findAll()).thenReturn(List.of(nota1, nota2, nota3));
       when(noteMapper.toResponse(nota1)).thenReturn(r1);
@@ -377,10 +375,9 @@ class NoteServiceTest {
       notaExistente.setContent("conteúdo antigo");
       notaExistente.setUser(userComum);
 
-      NoteRequest request = new NoteRequest("título novo", "conteúdo novo");
+      NoteRequest request = new NoteRequest("título novo", "conteúdo novo",0, null);
 
-      NoteResponse response = new NoteResponse(
-          1L, "título novo", "conteúdo novo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       when(noteRepository.findByIdAndUserUuid(1L, userId))
           .thenReturn(Optional.of(notaExistente));
@@ -404,10 +401,9 @@ class NoteServiceTest {
       notaExistente.setId(1L);
       notaExistente.setUser(userComum);
 
-      NoteRequest request = new NoteRequest("título novo", "conteúdo novo");
+      NoteRequest request = new NoteRequest("título novo", "conteúdo novo", 0, null);
 
-      NoteResponse response = new NoteResponse(
-          1L, "título novo", "conteúdo novo", null, null);
+      NoteResponse response = new NoteResponse(1L, "title", "content", 0, null, null, null);
 
       when(noteRepository.findByIdAndUserUuid(1L, userId))
           .thenReturn(Optional.of(notaExistente));
@@ -423,7 +419,7 @@ class NoteServiceTest {
     @DisplayName("NÃO deve salvar quando user tenta atualizar nota de outro user")
     void naoDeveSalvarQuandoUserTentaAtualizarNotaAlheia() {
       when(noteRepository.findByIdAndUserUuid(1L, userId)).thenReturn(Optional.empty());
-      NoteRequest request = new NoteRequest("título novo", "conteúdo novo");
+      NoteRequest request = new NoteRequest("título novo", "conteúdo novo", 0, null);
 
       assertThatThrownBy(() -> noteService.updateNote(1L, request, userComum))
           .isInstanceOf(RecursoNaoEncontradoException.class)

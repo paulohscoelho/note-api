@@ -1,13 +1,20 @@
 package notesapi.note.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-
+import java.time.LocalDateTime;
 public record NoteRequest(
-        @NotBlank
-        @Size(max = 100, message = "O titulo deve ter no maximo 100 caracteres")
-        String title,
-        @NotBlank(message = "O conteúdo é obrigatório")
-        String content
+    @NotBlank
+    @Size(max = 100, message = "O titulo deve ter no maximo 100 caracteres")
+    String title,
+
+    @NotBlank(message = "O conteúdo é obrigatório")
+    String content,
+
+    Integer priority,
+
+    @FutureOrPresent(message = "A data de vencimento não pode estar no passado")
+    LocalDateTime dueDate
 ) {
 }

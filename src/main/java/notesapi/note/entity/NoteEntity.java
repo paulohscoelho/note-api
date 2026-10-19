@@ -39,6 +39,9 @@ public class NoteEntity {
     @Column(name = "priority")
     private Integer priority = 0;
 
+    @Column(name = "due_date")
+    private LocalDateTime dueDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
