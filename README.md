@@ -5,12 +5,13 @@
 ![Spring Boot 4](https://img.shields.io/badge/Spring%20Boot-4.1.1-6DB33F?logo=springboot&logoColor=white)
 ![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white)
 ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Flyway](https://img.shields.io/badge/Flyway-CC0200?logo=flyway&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-C71A36?logo=apachemaven&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)
 ![Render](https://img.shields.io/badge/Render-46E3B7?logo=render&logoColor=white)
 
-Aplicação **full-stack** para gerenciamento de notas por usuário, com autenticação JWT, autorização por roles e deploy em produção.
+Aplicação **full-stack** para gerenciamento de notas por usuário, com autenticação JWT, autorização por roles (RBAC), migrações versionadas e deploy automatizado em produção.
 
 ## 🌐 Links de Produção
 
@@ -21,32 +22,32 @@ Aplicação **full-stack** para gerenciamento de notas por usuário, com autenti
 | **Health Check** | https://note-api-8qb4.onrender.com/actuator/health |
 | **Swagger UI** | https://note-api-8qb4.onrender.com/swagger-ui.html |
 
-> ⚠️ O backend está no plano **Free do Render**. Ele pode levar ~50s para "acordar" se ficar inativo. Para contornar isso, um monitor do **UptimeRobot** faz um ping a cada 5 minutos no endpoint `/actuator/health`, mantendo a aplicação ativa.
+> ⚠️ O backend está no plano **Free do Render**. Um monitor do **UptimeRobot** faz um ping a cada 5 minutos no endpoint `/actuator/health` para manter a aplicação ativa e evitar a hibernação.
 
 ## 📖 Sobre
 
-A **Notes API** é uma aplicação full-stack para gerenciamento de notas por usuário. Cada usuário pode criar, consultar, atualizar e remover suas próprias notas. A consulta e a remoção de usuários são operações administrativas.
+A **Notes API** é uma aplicação full-stack para gerenciamento de notas. Cada usuário pode criar, consultar, atualizar e remover suas próprias notas, atribuindo a elas níveis de **prioridade** e **data de vencimento**.
 
-A autenticação é feita via **JWT**: o cliente faz login com email e senha, recebe um token e o envia no header `Authorization` das requisições seguintes. O acesso é controlado por **roles** (`USER` e `ADMIN`) combinadas com **ownership** dos recursos.
+A autenticação é feita via **JWT**: o cliente faz login com email e senha, recebe um token e o envia no header `Authorization`. O acesso é controlado por **roles** (`USER` e `ADMIN`) combinadas com **ownership** dos recursos.
 
-A principal característica é o isolamento de dados: um usuário `USER` enxerga apenas os próprios recursos, enquanto um usuário `ADMIN` tem acesso a todos os usuários e todas as notas por meio de endpoints administrativos dedicados.
+O isolamento de dados é garantido: um usuário `USER` enxerga apenas os próprios recursos. Já o `ADMIN` possui acesso a um **Painel Administrativo** no frontend, onde pode listar, buscar, alterar a role e deletar usuários, além de visualizar todas as notas do sistema (com regras de negócio que impedem a exclusão/rebaixamento do último administrador).
 
 ## ✨ Funcionalidades
 
-- **Autenticação JWT** com login via email e senha
-- **Autorização por roles** (`USER` / `ADMIN`)
-- **Autorização por ownership** — o usuário só acessa seus próprios recursos; o admin acessa todos
-- **Gestão de usuários** (cadastro público; consulta e remoção só para `ADMIN`)
-- **CRUD de notas**
-- **Endpoints administrativos** para listar todos os usuários e todas as notas
-- **Frontend Angular** com interceptors de autenticação e guards de rota
-- **Tratamento de erros padronizado** (404, 409, 400, 401, 403, 500)
-- **Seed idempotente** do admin inicial via variáveis de ambiente
-- **Containerização completa** (Postgres + app + Adminer)
-- **CORS configurado** para múltiplas origens (dev e produção)
-- **Testes unitários** (29 cenários)
-- **CI com GitHub Actions** rodando os testes em cada push/PR na `main`
-- **Deploy automatizado**: backend no Render, frontend na Vercel, banco no Neon
+- **Autenticação JWT** com login via email e senha.
+- **Autorização por roles** (`USER` / `ADMIN`) com proteção no Backend e Frontend (Guards).
+- **Painel de Administração:** Tabela de usuários, busca em tempo real, alteração de roles e exclusão.
+- **CRUD de Notas Avançado:** Inclusão de **Prioridade** (com badges coloridas) e **Data de Vencimento**.
+- **Filtros e Ordenação:** Listagem de notas por mais recentes, título, maior/menor prioridade e vencimento.
+- **Paginação e Busca:** Busca textual por título/conteúdo e paginação de resultados.
+- **Versionamento de Banco:** Migrações estruturadas com **Flyway** (V1, V2, V3).
+- **Tratamento de erros padronizado** (404, 409, 400, 401, 403, 500).
+- **Seed idempotente** do admin inicial via variáveis de ambiente.
+- **Containerização completa** (Postgres + app + Adminer).
+- **CORS configurado** para múltiplas origens (dev e produção).
+- **Testes Automatizados:** Testes unitários (Mockito) e de integração (Testcontainers).
+- **Cobertura de Código:** Validação de cobertura com **JaCoCo** (mínimo de 80%).
+- **CI/CD:** GitHub Actions para testes/cobertura e deploy automático (Render/Vercel).
 
 ## 🛠️ Tech Stack
 
@@ -54,18 +55,16 @@ A principal característica é o isolamento de dados: um usuário `USER` enxerga
 |---|---|
 | Linguagem Backend | Java 21 |
 | Framework Backend | Spring Boot 4.1.1 (Spring MVC / Spring Data JPA) |
-| Framework Frontend | Angular 20 (standalone components, signals, interceptors) |
+| Framework Frontend | Angular 20 (standalone components, signals, guards, interceptors) |
 | Banco de Dados | PostgreSQL 16 (Docker local) / PostgreSQL 18 (Neon em produção) |
+| Migração de Banco | Flyway |
 | Autenticação | Spring Security + JWT (JJWT 0.12.5) |
 | Build Backend | Maven (via wrapper `./mvnw`) |
 | Build Frontend | Angular CLI + npm |
 | Container | Docker + Docker Compose |
-| Testes | JUnit 5, Mockito, AssertJ |
-| CI | GitHub Actions |
-| Deploy Backend | Render (Docker) |
-| Deploy Frontend | Vercel |
-| Deploy Banco | Neon (PostgreSQL serverless) |
-| Keep-Alive | UptimeRobot |
+| Testes | JUnit 5, Mockito, Testcontainers, AssertJ, JaCoCo |
+| CI/CD | GitHub Actions |
+| Deploy | Render (Backend), Vercel (Frontend), Neon (Banco) |
 
 ## 🚀 Como Rodar
 
@@ -126,7 +125,7 @@ A principal característica é o isolamento de dados: um usuário `USER` enxerga
 
 4. Acesse em [http://localhost:4200](http://localhost:4200).
 
-> O `environment.ts` do frontend aponta para `http://localhost:8080` em desenvolvimento e para o Render (`https://note-api-8qb4.onrender.com`) em produção (via `environment.prod.ts`).
+> O `environment.ts` do frontend aponta para `http://127.0.0.1:8080` em desenvolvimento e para o Render (`https://note-api-8qb4.onrender.com`) em produção (via `environment.prod.ts`).
 
 ### Opção C — Backend sem Docker (IDE)
 
@@ -146,210 +145,88 @@ A principal característica é o isolamento de dados: um usuário `USER` enxerga
 
 Crie um arquivo `.env` a partir do `.env.example`. Ele contém dados sensíveis e **não deve ser commitado**.
 
-### Backend (local)
-
-| Variável | Descrição | Exemplo |
-|---|---|---|
-| `JWT_SECRET` | Chave usada para assinar e validar os tokens JWT (Base64) | `openssl rand -base64 32` |
-| `ADMIN_EMAIL` | Email do usuário admin criado no seed inicial | `admin@example.com` |
-| `ADMIN_PASSWORD` | Senha do usuário admin criado no seed inicial | `change-me` |
-| `DB_USER` | Usuário do PostgreSQL | `postgres` |
-| `DB_PASSWORD` | Senha do PostgreSQL | `postgres` |
-| `DB_NAME` | Nome do banco de dados | `notesdb` |
-| `DB_PORT` | Porta exposta do PostgreSQL | `5432` |
-
-### Backend (produção — Render)
+### Backend (local e produção)
 
 | Variável | Descrição |
 |---|---|
-| `SPRING_PROFILES_ACTIVE` | `prod` |
-| `JWT_SECRET` | Chave JWT gerada com `openssl rand -base64 32` |
-| `SPRING_DATASOURCE_URL` | JDBC URL do Neon (ex: `jdbc:postgresql://...neon.tech/neondb?sslmode=require`) |
-| `SPRING_DATASOURCE_USERNAME` | Usuário do Neon |
-| `SPRING_DATASOURCE_PASSWORD` | Senha do Neon |
-| `ADMIN_EMAIL` | Email do admin inicial |
-| `ADMIN_PASSWORD` | Senha do admin inicial |
-| `APP_CORS_ALLOWED_ORIGINS` | Origens permitidas, separadas por vírgula (ex: `http://localhost:4200,https://note-api-delta.vercel.app`) |
+| `SPRING_PROFILES_ACTIVE` | `prod` (no Render) ou `dev` (local) |
+| `JWT_SECRET` | Chave usada para assinar e validar os tokens JWT (Base64) |
+| `SPRING_DATASOURCE_URL` | JDBC URL do banco (ex: `jdbc:postgresql://...neon.tech/neondb?sslmode=require`) |
+| `SPRING_DATASOURCE_USERNAME` | Usuário do banco |
+| `SPRING_DATASOURCE_PASSWORD` | Senha do banco |
+| `ADMIN_EMAIL` | Email do usuário admin criado no seed inicial |
+| `ADMIN_PASSWORD` | Senha do usuário admin criado no seed inicial |
+| `APP_CORS_ALLOWED_ORIGINS` | Origens permitidas, separadas por vírgula |
 
-## 📚 Endpoints
+## 📚 Endpoints Principais
 
-### Auth (público)
-
+### Auth
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
 | POST | `/auth/login` | Autentica o usuário e retorna um token JWT | público |
 
 ### Users
-
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
 | POST | `/users` | Cria um novo usuário | público |
 | GET | `/users/me` | Retorna os dados do usuário autenticado | USER ou ADMIN |
-| GET | `/users/{uuid}/notes` | Busca um usuário e suas notas | USER (dono) ou ADMIN |
 
-### Notes
-
+### Notes (Campos: `title`, `content`, `priority`, `dueDate`)
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
-| POST | `/notes` | Cria uma nota para o usuário autenticado | USER ou ADMIN |
-| GET | `/notes` | Lista as notas do usuário autenticado (paginado) | USER ou ADMIN |
+| POST | `/notes` | Cria uma nota | USER ou ADMIN |
+| GET | `/notes` | Lista as notas do usuário (paginado e com filtros) | USER ou ADMIN |
 | GET | `/notes/{id}` | Busca uma nota pelo id | USER (dono) ou ADMIN |
 | PUT | `/notes/{id}` | Atualiza uma nota | USER (dono) ou ADMIN |
 | DELETE | `/notes/{id}` | Remove uma nota | USER (dono) ou ADMIN |
 
 ### Admin
-
 | Método | Endpoint | Descrição | Auth |
 |---|---|---|---|
-| GET | `/admin/users` | Lista todos os usuários | ADMIN |
+| GET | `/admin/users` | Lista todos os usuários (paginado) | ADMIN |
 | GET | `/admin/users/{uuid}` | Busca um usuário pelo UUID | ADMIN |
-| GET | `/admin/users/search?email=` | Busca um usuário pelo email | ADMIN |
+| PATCH | `/admin/users/{uuid}/role` | Altera a role de um usuário | ADMIN |
 | DELETE | `/admin/users/{uuid}` | Remove um usuário | ADMIN |
-| GET | `/admin/notes` | Lista todas as notas | ADMIN |
+| GET | `/admin/notes` | Lista todas as notas do sistema | ADMIN |
 
-### Infra
+## 🧪 Testes e Cobertura
 
-| Método | Endpoint | Descrição | Auth |
-|---|---|---|---|
-| GET | `/actuator/health` | Health check da aplicação | público |
-
-## 📖 Documentação da API
-
-A API tem documentação interativa via **Swagger UI** (OpenAPI 3):
-
-- **Swagger UI (local):** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
-- **Swagger UI (prod):** [https://note-api-8qb4.onrender.com/swagger-ui.html](https://note-api-8qb4.onrender.com/swagger-ui.html)
-- **OpenAPI spec (JSON):** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
-
-> ⚠️ O botão **"Authorize"** do Swagger UI tem um [bug conhecido](https://github.com/springdoc/springdoc-openapi/issues/3374) com Spring Boot 4 + springdoc 3.x. **Para testar endpoints autenticados**, use o Insomnia/curl.
-
-## 🧪 Testes
-
-Rode a suíte com:
+Rode a suíte de testes (unitários e de integração com Testcontainers) e gere o relatório de cobertura:
 
 ```bash
-./mvnw test
+./mvnw verify
 ```
 
-Atualmente são **29 testes unitários** cobrindo `NoteService`, `UserService` e `JwtService`.
+- **Testes Unitários:** JUnit 5, Mockito e AssertJ.
+- **Testes de Integração:** Testcontainers (sobe um PostgreSQL temporário) e MockMvc.
+- **Cobertura (JaCoCo):** O build falha se a cobertura de linhas cair abaixo de **80%**. O relatório HTML fica em `target/site/jacoco/index.html`.
 
-Padrões e ferramentas utilizados:
+O **CI** (GitHub Actions) executa os testes e valida a cobertura automaticamente a cada push/PR na branch `main`.
 
-- **JUnit 5** com `@Nested` para organizar cenários por contexto
-- **Mockito** com `ArgumentCaptor` para inspecionar argumentos capturados
-- **AssertJ** para asserções fluentes
-- **`verifyNoInteractions`** para garantir que dependências não foram acionadas
+## 🏗️ Arquitetura e Decisões
 
-O **CI** executa os testes automaticamente a cada push e PR na branch `main`, via GitHub Actions.
-
-## 🏗️ Arquitetura
-
-### Estrutura de pacotes (backend)
-
-```
-notesapi/
-├── admin/         # Endpoints administrativos e seed do admin inicial
-├── auth/          # Autenticação e DTOs de login
-├── common/        # Tratamento de erros padronizado (exceptions, handler global)
-├── note/          # Domínio de notas (controller, service, entity, repository, dto, mapper)
-├── security/      # Configuração de segurança, JWT, CORS e filtro de autenticação
-└── user/          # Domínio de usuários (controller, service, entity, repository, dto, mapper)
-```
-
-### Estrutura de pastas (frontend)
-
-```
-frontend/src/app/
-├── components/    # Componentes (login, registro, lista de notas, etc.)
-├── guards/        # Guards de rota (authGuard)
-├── interceptors/  # Interceptor HTTP que injeta o JWT nas requisições
-├── models/        # Interfaces TypeScript (Note, User, Page, etc.)
-├── services/      # Serviços HTTP (auth.service, note.service)
-├── app.config.ts  # Configuração global (providers, httpClient, interceptor)
-└── app.routes.ts  # Definição das rotas
-```
-
-### Fluxo de autenticação
-
-1. O cliente envia `POST /auth/login` com email e senha.
-2. O `AuthenticationManager` valida as credenciais.
-3. O `JwtService` gera um token contendo o subject (email) e a claim de role.
-4. O cliente passa a enviar o token no header `Authorization: Bearer <token>`.
-5. O `JwtAuthenticationFilter` intercepta a requisição, valida o token e carrega os `UserDetails`.
-6. O `SecurityContext` é populado com a autenticação, liberando o acesso conforme role e ownership.
-
-### Modelo de autorização
-
-- **Roles:** `USER` (acessa apenas os próprios recursos) e `ADMIN` (acessa tudo).
-- **Ownership:** verificado no service (via `loadAccessibleNote`) e nas anotações `@PreAuthorize` (ex.: `#uuid == authentication.principal.uuid or hasRole('ADMIN')`).
-
-### Fluxo de CORS
-
-O `CorsConfig` lê a variável `APP_CORS_ALLOWED_ORIGINS` (separada por vírgula) e configura as origens permitidas. No `SecurityConfig`, requisições `OPTIONS` (preflight) são liberadas com `permitAll()`, e o `JwtAuthenticationFilter` ignora requisições OPTIONS para não bloquear o preflight.
-
-## ☁️ Deploy
-
-### Backend (Render + Docker)
-
-1. Crie um **Web Service** no [Render](https://render.com) apontando para o repositório GitHub.
-2. Selecione o ambiente **Docker** (o `Dockerfile` multi-stage na raiz já faz o build).
-3. Configure as variáveis de ambiente de produção (ver seção acima).
-4. O Render faz o build e disponibiliza a URL pública.
-
-### Frontend (Vercel)
-
-1. Importe o repositório na [Vercel](https://vercel.com).
-2. Configure o **Root Directory** como `frontend`.
-3. Framework Preset: **Angular**.
-4. Build Command: `ng build --configuration production`.
-5. Output Directory: `dist/frontend/browser`.
-
-### Banco de Dados (Neon)
-
-1. Crie um projeto no [Neon](https://neon.tech).
-2. Copie a connection string no formato JDBC (`jdbc:postgresql://...neon.tech/neondb?sslmode=require`).
-3. Configure as variáveis `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD` no Render.
-
-### Keep-Alive (UptimeRobot)
-
-Como o plano Free do Render desliga a aplicação após 15 minutos de inatividade, um monitor HTTP do [UptimeRobot](https://uptimerobot.com) faz um ping a cada 5 minutos em `/actuator/health` para manter a aplicação ativa.
-
-## 🔐 Decisões de Design
-
-- **JWT em vez de sessão:** a API é *stateless*, o que facilita a escalabilidade horizontal e dispensa armazenamento de sessão no servidor.
-- **404 em recurso alheio (e não 403):** evita IDOR, impedindo que um usuário descubra a existência de recursos de terceiros.
-- **Seed do admin via `CommandLineRunner`:** é idempotente e garante o primeiro admin na subida da aplicação a partir de variáveis de ambiente.
-- **Role via enum:** simples e suficiente, já que cada usuário tem exatamente uma role — um RBAC completo com tabelas não é necessário hoje.
-- **`@PreAuthorize` + URL matcher:** aplica defesa em profundidade, validando o acesso tanto na camada de método quanto na configuração de segurança.
-- **Environments no Angular:** URLs da API são externalizadas em `environment.ts` e `environment.prod.ts`, permitindo build de produção com `fileReplacements` via `angular.json`.
+- **JWT em vez de sessão:** API *stateless*, facilitando a escalabilidade.
+- **404 em recurso alheio (e não 403):** Evita IDOR (Insecure Direct Object Reference).
+- **Flyway em vez de `ddl-auto: update`:** Garante que as alterações no banco sejam auditáveis, versionadas e seguras em produção.
+- **Defesa em profundidade:** Segurança aplicada via `@PreAuthorize` no backend e `adminGuard` no frontend.
+- **Regras de Negócio:** Bloqueio de rebaixamento do último ADMIN e restrição de alteração da própria role.
+- **Environments no Angular:** URLs da API externalizadas para facilitar o build de produção.
 
 ## 📁 Estrutura de Pastas
 
 ```
 note-api/
-├── .github/
-│   └── workflows/
-│       └── ci.yml           # Workflow do GitHub Actions
-├── frontend/                # Aplicação Angular
-│   ├── src/
-│   │   ├── app/             # Componentes, services, guards, interceptors
-│   │   └── environments/    # environment.ts (dev) e environment.prod.ts
-│   ├── angular.json
-│   └── package.json
+├── .github/workflows/ci.yml # Workflow do GitHub Actions
+├── frontend/                # Aplicação Angular (components, guards, services)
 ├── src/
 │   ├── main/
-│   │   ├── java/notesapi/   # Código-fonte do backend
+│   │   ├── java/notesapi/   # Código-fonte do backend (admin, auth, note, user...)
 │   │   └── resources/
-│   │       ├── application.yaml
-│   │       ├── application-dev.yaml
-│   │       └── application-prod.yaml
-│   └── test/
-│       └── java/notesapi/   # Testes unitários e de integração
-├── .env.example             # Template das variáveis de ambiente
-├── .gitignore
+│   │       ├── db/migration # Scripts SQL do Flyway (V1, V2, V3)
+│   │       └── application*.yaml
+│   └── test/                # Testes unitários e de integração (IT)
 ├── docker-compose.yml       # Orquestração: app + postgres + adminer
-├── Dockerfile               # Build multi-stage da aplicação (backend)
-├── mvnw / mvnw.cmd          # Maven Wrapper
+├── Dockerfile               # Build multi-stage do backend
 ├── pom.xml
 └── README.md
 ```
