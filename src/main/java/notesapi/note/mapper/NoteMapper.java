@@ -1,6 +1,4 @@
 package notesapi.note.mapper;
-
-
 import notesapi.note.dto.NoteRequest;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.dto.NoteSummaryResponse;
@@ -17,6 +15,7 @@ public interface NoteMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "sharedWith", ignore = true)
     NoteEntity toEntity (NoteRequest request);
 
     NoteSummaryResponse toSummaryResponse(NoteEntity entity);
@@ -27,5 +26,6 @@ public interface NoteMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "sharedWith", ignore = true)
     void updateEntityFromDto(NoteRequest request, @MappingTarget NoteEntity entity);
 }

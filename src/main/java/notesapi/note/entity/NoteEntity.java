@@ -10,6 +10,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import notesapi.user.entity.UserEntity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,5 +48,13 @@ public class NoteEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "tb_note_shares",
+        joinColumns = @JoinColumn(name = "note_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<UserEntity> sharedWith = new HashSet<>();
 
 }
