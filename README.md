@@ -76,9 +76,20 @@ O isolamento de dados é garantido: um usuário `USER` enxerga apenas os própri
 
 ## 🚀 Como Rodar
 
-### Opção A — Stack completa via Docker (backend + banco)
+### 📋 Pré-requisitos
+Para rodar este projeto localmente, você precisará de:
+- **Java 21** (ou superior)
+- **Node.js 20+** e **npm** (para o frontend)
+- **Docker** e **Docker Compose** (para o banco de dados)
+- **Maven** (opcional, pois o projeto já possui o wrapper `./mvnw`)
 
-**Pré-requisitos:** Docker Desktop instalado.
+### 🔑 Credenciais de Acesso (Ambiente Local)
+O projeto possui um `AdminSeeder` que cria automaticamente um usuário administrador na primeira execução.
+- **E-mail:** `admin@notesapi.local`
+- **Senha:** `Admin@123456`
+  *(Você pode alterar esses valores no arquivo `.env`)*
+
+### Opção A — Stack completa via Docker (backend + banco)
 
 1. Clone o repositório:
    ```bash
