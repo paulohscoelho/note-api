@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import notesapi.note.dto.NoteRequest;
 import notesapi.note.dto.NoteResponse;
+import notesapi.note.dto.ShareNoteRequest;
 import notesapi.note.service.NoteService;
 import notesapi.user.entity.UserEntity;
 import org.springframework.data.domain.Page;
@@ -78,5 +79,25 @@ public class NoteController {
                                        @AuthenticationPrincipal UserEntity user) {
         service.deleteNote(id, user);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Compartilhar nota com outro usuário")
+    @PostMapping("/{id}/share")
+    public ResponseEntity<Void> shareNote(
+        @PathVariable Long id,
+        @Valid @RequestBody ShareNoteRequest request,
+        @AuthenticationPrincipal UserEntity user)
+    {
+        service.shareNote(id, request.email(), user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Listar notas compartilhadas comigo")
+    @GetMapping("/shared")
+    public ResponseEntity<Page<NoteResponse>> getSharedNotes(
+        @PageableDefault(page = 0, size = 10, sort = "createdAt") Pageable pageable,
+        @AuthenticationPrincipal UserEntity user) {
+        Page<NoteResponse> notes = service.getSharedNotes(user.getUuid(), pageable);
+        return ResponseEntity.ok(notes);
     }
 }

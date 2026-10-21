@@ -2,6 +2,7 @@ package notesapi.note.service;
 
 import lombok.RequiredArgsConstructor;
 import notesapi.common.exception.RecursoNaoEncontradoException;
+import notesapi.common.exception.RegraNegocioException;
 import notesapi.note.dto.NoteRequest;
 import notesapi.note.dto.NoteResponse;
 import notesapi.note.entity.NoteEntity;
@@ -9,6 +10,7 @@ import notesapi.note.mapper.NoteMapper;
 import notesapi.note.repository.NoteRepository;
 import notesapi.user.entity.Role;
 import notesapi.user.entity.UserEntity;
+import notesapi.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @Service
 public class NoteService {
     private final NoteRepository noteRepository;
+    private final UserRepository userRepository;
     private final NoteMapper mapper;
 
     @Transactional(readOnly = true)
@@ -92,6 +95,26 @@ public class NoteService {
         noteRepository.delete(note);
     }
 
+    @Transactional
+    public void shareNote(Long noteId, String emailToShare, UserEntity currentUser) {
+        NoteEntity note = loadAccessibleNote(noteId, currentUser);
+
+        UserEntity targetUser = userRepository.findByEmail(emailToShare)
+            .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado."));
+
+        if (targetUser.getUuid().equals(currentUser.getUuid())) {
+            throw new RegraNegocioException("Você não pode compartilhar uma nota com você mesmo.");
+        }
+        note.getSharedWith().add(targetUser);
+        noteRepository.save(note);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NoteResponse> getSharedNotes(UUID userId, Pageable pageable) {
+        return noteRepository.findSharedWithMe(userId, pageable)
+            .map(mapper::toResponse);
+    }
+
     private NoteEntity loadAccessibleNote(Long id, UserEntity currentUser){
         if (currentUser.getRole() == Role.ADMIN){
             return noteRepository.findById(id)
@@ -100,5 +123,6 @@ public class NoteService {
         return noteRepository.findByIdAndUserUuid(id,currentUser.getUuid())
             .orElseThrow(()-> new RecursoNaoEncontradoException("nota não encontrada"));
     }
+
 
 }
