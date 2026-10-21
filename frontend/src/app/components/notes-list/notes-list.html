@@ -1,20 +1,24 @@
 <div class="notes-container">
   <div class="notes-header">
     <h1>Minhas Notas</h1>
+    @if (viewMode === 'my') {
     <a routerLink="/notes/new" class="btn-new">+ Nova Nota</a>
+    }
   </div>
 
-  <div class="search-box" style="display: flex; gap: 10px; align-items: center;">
-    <input
-      type="text"
-      [(ngModel)]="search"
-      (keyup.enter)="onSearch()"
-      placeholder="Buscar por título ou conteúdo..."
-      [disabled]="loading"
-      style="flex: 1;"
-    />
-    <button (click)="onSearch()" [disabled]="loading">Buscar</button>
+  <div class="tabs-container">
+    <button class="tab-btn" [class.active]="viewMode === 'my'" (click)="changeView('my')">
+      Minhas Notas
+    </button>
+    <button class="tab-btn" [class.active]="viewMode === 'shared'" (click)="changeView('shared')">
+      Compartilhadas Comigo
+    </button>
+  </div>
 
+  @if (viewMode === 'my') {
+  <div class="search-box" style="display: flex; gap: 10px; align-items: center; margin-bottom: 2rem;">
+    <input type="text" [(ngModel)]="search" (keyup.enter)="onSearch()" placeholder="Buscar por título ou conteúdo..." [disabled]="loading" style="flex: 1;" />
+    <button (click)="onSearch()" [disabled]="loading">Buscar</button>
     <select [(ngModel)]="sortOption" (change)="onSortChange()" [disabled]="loading" class="sort-select">
       <option value="createdAt,desc">Mais recentes</option>
       <option value="title,asc">Título (A-Z)</option>
@@ -23,6 +27,7 @@
       <option value="dueDate,asc">Vencimento mais próximo</option>
     </select>
   </div>
+  }
 
   <div class="notes-list">
     @for (note of notes; track note.id) {
@@ -35,15 +40,21 @@
           <span class="badge priority" [ngClass]="getPriorityClass(note.priority)">
             Prioridade: {{ getPriorityLabel(note.priority) }}
           </span>
-
           @if (note.dueDate) {
           <span class="badge due-date">Vence: {{ note.dueDate | date:'dd/MM/yyyy' }}</span>
           }
+          @if (viewMode === 'shared') {
+          <span class="badge shared-by">Compartilhada por: {{ note.user?.email }}</span>
+          }
         </div>
       </div>
+
       <div class="note-actions">
+        @if (viewMode === 'my') {
+        <button (click)="shareNote(note.id)" class="btn-share">Compartilhar</button>
         <a [routerLink]="['/notes', note.id, 'edit']" class="btn-edit">Editar</a>
         <button (click)="deleteNote(note.id, note.title)" class="btn-delete">Excluir</button>
+        }
       </div>
     </div>
     } @empty {
@@ -60,5 +71,4 @@
     <button (click)="nextPage()" [disabled]="isLastPage || loading">Próxima</button>
   </div>
   }
-
 </div>

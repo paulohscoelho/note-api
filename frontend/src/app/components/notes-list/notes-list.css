@@ -236,3 +236,48 @@
   color: #aaa;
   cursor: not-allowed;
 }
+
+.tabs-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  padding: 0.6rem 1.2rem;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background-color: #3949ab;
+  color: white;
+  border-color: #3949ab;
+}
+
+.btn-share {
+  padding: 0.4rem 0.8rem;
+  background-color: #e0e7ff;
+  color: #3730a3;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.btn-share:hover {
+  opacity: 0.8;
+}
+
+.badge.shared-by {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+}
