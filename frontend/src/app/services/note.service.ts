@@ -12,16 +12,18 @@ export class NoteService {
   constructor(private http: HttpClient) {}
 
   list(page: number = 0, size: number = 10, search?: string, sort: string = 'createdAt,desc'): Observable<Page<Note>> {
-    let params = new HttpParams()
-      .set('page', page)
-      .set('size', size)
-      .set('sort', sort);
-
-    if (search && search.trim()) {
-      params = params.set('search', search.trim());
-    }
-
+    let params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
+    if (search && search.trim()) params = params.set('search', search.trim());
     return this.http.get<Page<Note>>(`${this.API_URL}/notes`, { params });
+  }
+
+  getSharedNotes(page: number = 0, size: number = 10, sort: string = 'createdAt,desc'): Observable<Page<Note>> {
+    let params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
+    return this.http.get<Page<Note>>(`${this.API_URL}/notes/shared`, { params });
+  }
+
+  shareNote(id: number, email: string): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/notes/${id}/share`, { email });
   }
 
   getById(id: number): Observable<Note> {
